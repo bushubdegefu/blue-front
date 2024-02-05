@@ -39,7 +39,8 @@ export const useRoleStore = create(
                   
                   
                 }).catch((response,error)=> {
-                    const responseError = response?.response?.data?.details
+                    // console.log(response)
+                    const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                     toast.error(responseError,{
                         position: 'top-right'
                       })
@@ -64,6 +65,7 @@ export const useRoleStore = create(
                      
                      
                    }).catch((response,error)=> {
+                    
                        const responseError = response?.response?.data?.details
                        toast.error(responseError,{
                            position: 'top-right'
@@ -156,8 +158,47 @@ export const useRoleStore = create(
             }))
         },
         patchRole: async (data) => { 
-                console.log(data)
+            let token = useLogInStore.getState().access_token;
+            await  blueClient.request({
+                   method: 'PATCH',
+                   url: `/roles/${data?.id}`,
+                   headers: {
+                       'Content-Type': 'application/json',
+                       'X-APP-TOKEN' : `Bearer ${token}`
+                   },
+                   data: data
+               }).then(function (response) {               
+                    get().getSingleRole(data?.id)
+                    get().getRoles()
+                 }).catch((response,error)=> {
+                       const responseError = response?.response?.data?.details
+                       toast.error(responseError,{
+                           position: 'top-right'
+                         })
+                      
+                   });
             },
+        postRole: async (data) => { 
+                let token = useLogInStore.getState().access_token;
+                await  blueClient.request({
+                       method: 'POST',
+                       url: `/roles`,
+                       headers: {
+                           'Content-Type': 'application/json',
+                           'X-APP-TOKEN' : `Bearer ${token}`
+                       },
+                       data: data
+                   }).then(function (response) {               
+                        get().getRoles()
+                         
+                     }).catch((response,error)=> {
+                           const responseError = response?.response?.data?.details
+                           toast.error(responseError,{
+                               position: 'top-right'
+                             })
+                          
+                       });
+                },
         activateDeactivate: async (id,status) => {
             let token = useLogInStore.getState().access_token;
            

@@ -39,7 +39,7 @@ export const useEndPointStore = create(
                   
                   
                 }).catch((response,error)=> {
-                    const responseError = response?.response?.data?.details
+                    const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                     toast.error(responseError,{
                         position: 'top-right'
                       })
@@ -66,7 +66,7 @@ export const useEndPointStore = create(
                      
                      
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -91,7 +91,7 @@ export const useEndPointStore = create(
                    }))
                     
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -113,7 +113,7 @@ export const useEndPointStore = create(
                   update_feature(id)
                     
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -134,7 +134,7 @@ export const useEndPointStore = create(
                   get().getSingleEndPoint(endpoint_id)
                   update_feature(id)  
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -178,9 +178,68 @@ export const useEndPointStore = create(
                 filtered_endpoints : renderData
             }))
         },
-        patchEndPoint: async (data) => { 
-                console.log(data)
+        patchEndpoint: async (data) => { 
+            let token = useLogInStore.getState().access_token;
+            await  blueClient.request({
+                   method: 'PATCH',
+                   url: `/endpoints/${data?.id}`,
+                   headers: {
+                       'Content-Type': 'application/json',
+                       'X-APP-TOKEN' : `Bearer ${token}`
+                   },
+                   data: data
+               }).then(function (response) {           
+                    get().getSingleEndPoint(data?.id)
+                    get().getEndPoints()
+                 }).catch((response,error)=> {
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                       toast.error(responseError,{
+                           position: 'top-right'
+                         })
+                      
+                   });
             },
+        postEndpoint: async (data) => { 
+                let token = useLogInStore.getState().access_token;
+                console.log(data)
+                await  blueClient.request({
+                       method: 'POST',
+                       url: `/endpoints`,
+                       headers: {
+                           'Content-Type': 'application/json',
+                           'X-APP-TOKEN' : `Bearer ${token}`
+                       },
+                       data: data
+                   }).then(function (response) {               
+                        get().getEndPoints()
+                         
+                     }).catch((response,error)=> {
+                           const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                           toast.error(responseError,{
+                               position: 'top-right'
+                             })
+                          
+                       });
+                },
+        deleteEndpoint: async (id) => { 
+                    let token = useLogInStore.getState().access_token;
+                    await  blueClient.request({
+                           method: 'DELETE',
+                           url: `/endpoints/${id}`,
+                           headers: {
+                               'Content-Type': 'application/json',
+                               'X-APP-TOKEN' : `Bearer ${token}`
+                           },
+                       }).then(function (response) {           
+                            get().getEndPoints()
+                         }).catch((response,error)=> {
+                               const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                               toast.error(responseError,{
+                                   position: 'top-right'
+                                 })
+                              
+                           });
+                    },
         activateDeactivate: async (id,status) => {
             let token = useLogInStore.getState().access_token;
            
@@ -196,7 +255,7 @@ export const useEndPointStore = create(
                 get().getEndPoints()
                 get().getSingleEndPoint(id)
                 }).catch((response,error)=> {
-                    const responseError = response?.response?.data?.details
+                    const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                     toast.error(responseError,{
                         position: 'top-right'
                       })

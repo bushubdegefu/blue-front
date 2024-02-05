@@ -36,7 +36,7 @@ export const useLogInStore = create(
                   
                   
                 }).catch((response,error)=> {
-                    const responseError = response?.response?.data?.details
+                    const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                     toast.error(responseError,{
                         position: 'top-right'
                       })

@@ -1,34 +1,15 @@
 import { useState } from "react"
 import { SingleInput, CheckBoxInput, PasswordInput  } from "../components/Input"
 import { NormalButton } from "../components/Button"
-import { useLogInStore } from "../store/login"
+import { useUserStore } from "../store/user"
 import { ErrorBoundary } from "../components/ErrorBoundary"
 
-export  function PostUser({ data, setMatch, conpassword }){
-    const access_token = useLogInStore((state)=>state.access_token) 
-    
-    async function handleClick(){
-        if ( data.password != conpassword){
-            setMatch(true)
-        }else{
-            setMatch(false)
-            // mutate(data, access_token)
-        }
-        console.log(data)
-    }
-    return (
-        <>
-        <NormalButton 
-        label="Sign Up" 
-        handleClick={handleClick.bind(this)} />
-        </>
-        )
-}
+
+
 
 export function SignUpPage(){
 
-
-    // const notify = () => toast(`${response_error}`);
+    const postUser = useUserStore((state)=>state.postUser) 
 
     const [show,setShow]=useState(false)
     const [match,setMatch]=useState(false)
@@ -38,7 +19,22 @@ export function SignUpPage(){
         "disabled": true
     });
     const [conpassword,setConpassword]=useState('')
-      
+    
+    const handleClick = ()=>{
+        if (conpassword != values.password){
+            setMatch(true)
+        } else {
+            setMatch(false)
+            postUser(values)
+            setValues((values) => ({
+                ...values,
+                "email": "",
+                "password": "",
+                "disabled": false
+             }));
+             setConpassword('')
+        }
+    }
     const handleInputChange = (event) => {
         event.persist();
         const target=event.target
@@ -118,8 +114,10 @@ export function SignUpPage(){
                                     />
                                     <br/>                                    
                                    <ErrorBoundary>
-                                        <PostUser data={values} setMatch={setMatch} conpassword={conpassword} />
-                                   </ErrorBoundary>
+                                        <NormalButton 
+                                        label="Sign Up" 
+                                        handleClick={handleClick.bind(this)} />
+                                    </ErrorBoundary>
                                     
                                  
                             </form>

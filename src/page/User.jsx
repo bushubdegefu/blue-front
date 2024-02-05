@@ -1,5 +1,7 @@
 import { ErrorBoundary } from '../components/ErrorBoundary'
-import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon} from "../components/Icons";
+import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon, EditIcon, CancelIcon, UpdateIcon} from "../components/Icons";
+import { SelectInput, SingleInput, CheckBoxInput,ReadOnlySingleInputNoLabel,TextInputNoLabel,SingleInputNoLabel } from "../components/Input"
+
 import { useEffect, Fragment, useState } from 'react';
 import { useUserStore } from '../store/user';
 import { Pagination } from '../components/Pagination';
@@ -267,7 +269,7 @@ export function AddRoleToUserForm( {user_id } ){
     const addUserRole = useUserStore((state)=>state.addUserRole)   
     const [roleId, setRoleId] = useState();
     const handleClick =()=>{
-       
+        console.log(roleId)
         if ( roleId != "select to add"){
             addUserRole(user_id,roleId)
         }
@@ -320,11 +322,44 @@ export function AddRoleToUserForm( {user_id } ){
 
 export function EditableSingleUserComponent( {item} ){
     const [tabToken,setTabToken]=useState(1)
-  
+    const patch = useUserStore((state)=>state.patchUser)
+    const [edit,setEdit]=useState(false)
+    const [values, setValues] = useState({
+        id: '',
+        email : '',
+        disabled: ''
+    });
+
+    const editing=()=>{
+        setEdit(!edit)
+        setValues((values) => ({
+            ...values,
+                id : item?.id,
+                email: item?.email,
+                disabled: item?.disabled
+            }));
+    
+    }
+    const handlePatch =()=>{
+        patch(values)
+        setEdit(false)
+    }
+    
+    const handleInputChange = (event) => {
+        event.persist();
+        const target=event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        setValues((values) => ({
+           ...values,
+           [target.name] : value,
+        }));
+       
+    };
+    
     if (item != null) {
     return (
     <Fragment key={'form-row'+item.id}>
-        <div  className="w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto">
+          <div  className={edit ? "hidden":"w-full  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto"}>
             <div className="flex bg-gray-50 w-1/12 justify-center items-center">
                 <p>{item.id}</p>
             </div>
@@ -335,9 +370,71 @@ export function EditableSingleUserComponent( {item} ){
                 <p> {item.email}</p>
             </div>
             <div className="flex justify-center capitalize items-center bg-gray-50 w-3/12 ">
-                <p> {item.disabled.toString()}</p>
+                    <div  className="w-8/12  flex flex-row space-x-1 my-auto items-stretch justify-center h-auto">
+                        <p> {item.disabled.toString()}</p>
+                    </div>
+                    <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
+                        <div className="w-full flex justify-center items-center">
+                            <button onClick={editing}>
+                                <EditIcon />
+                            </button>
+                        </div>
+                    </div>
             </div>
         </div>
+        <ErrorBoundary>
+            <div  className={edit ? "w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
+                <div className="flex bg-gray-50 w-1/12 justify-center items-center">
+                    <ReadOnlySingleInputNoLabel 
+                        name="id" 
+                        label="User ID"  
+                        inputType="text" 
+                        placeHolder="Admin" 
+                        value={values.id} 
+                            />
+                </div>
+                <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-4/12 overflow-hidden">
+                    <ReadOnlySingleInputNoLabel 
+                        name="uuid" 
+                        label="UUID"  
+                        inputType="text" 
+                        placeHolder="user identifier" 
+                        value={item?.uuid} 
+                        handler={handleInputChange.bind(this)}  />
+                </div>
+                <div className="flex justify-center items-center break-all bg-gray-50 w-4/12 text-ellipsis">
+                    <SingleInputNoLabel 
+                        name="email" 
+                        label="email"  
+                        inputType="text" 
+                        placeHolder="What you can do with feature" 
+                        value={values?.email} 
+                        handler={handleInputChange.bind(this)} />
+                </div>
+                <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
+                    <div className="flex justify-center items-center h-full w-4/12 bg-gray-100">
+                        <CheckBoxInput
+                            value={values?.disabled} 
+                            label=""
+                            name="disabled"
+                            handler={handleInputChange.bind(this)}
+                            />
+                    </div>
+                    <div className="flex justify-center items-center w-4/12 bg-gray-50">
+                        <ErrorBoundary>
+                            <button onClick={()=>handlePatch()} >
+                                <UpdateIcon />
+                            </button>
+                        </ErrorBoundary>
+                    </div>
+                    <div className="flex justify-center items-center w-4/12 bg-gray-50">
+                        <button onClick={()=>setEdit(!edit)} >
+                            <CancelIcon />
+                        </button>                            
+                    </div>
+                </div>
+            </div>        
+        </ErrorBoundary>
         <br/>
         <div className="w-full flex items-stretch justify-start h-full ">
             <div className="w-full tabs">
@@ -442,11 +539,11 @@ export function EditableSingleUserComponent( {item} ){
                                                                       
                              item.roles?.map((role,index)=>{
                                 return (
-                                    <div key={index+role.name} className="flex w-2/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                        <div className="w-9/12 text-sm text-nowrap text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
+                                    <div key={index+role.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                        <div className="w-10/12 text-sm text-nowrap text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
                                             <p>{role.name}</p>
                                         </div>
-                                        <div className="w-3/12 flex items-center justify-center bg-slate-300">
+                                        <div className="w-2/12 flex items-center justify-center bg-slate-300">
                                             <ErrorBoundary>
                                                 <DeleteUserRoleButton role_id={role.id} user_id={item.id} />
                                             </ErrorBoundary>
@@ -534,8 +631,40 @@ export function EditableSingleUserComponent( {item} ){
 
 export function EditableSingleUserComponentMobile({item}){
     const [tabToken,setTabToken]=useState(1) 
-     
     const [view,setView]=useState(false)
+    const patch = useUserStore((state)=>state.patchUser)
+    const [edit,setEdit]=useState(false)
+    const [values, setValues] = useState({
+        id: '',
+        email : '',
+        disabled: ''
+    });
+
+    const editing=()=>{
+        setEdit(!edit)
+        setValues((values) => ({
+            ...values,
+                id : item?.id,
+                email: item?.email,
+                disabled: item?.disabled
+            }));
+    
+    }
+    const handlePatch =()=>{
+        patch(values)
+        setEdit(false)
+    }
+    
+    const handleInputChange = (event) => {
+        event.persist();
+        const target=event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        setValues((values) => ({
+           ...values,
+           [target.name] : value,
+        }));
+       
+    };
   
     if (item != null){
 
@@ -543,23 +672,94 @@ export function EditableSingleUserComponentMobile({item}){
         <Fragment key={'mobile-form-row'+item.id}>                   
             {/* # */}
             <div key={item.id+'-mobile'} className="w-full bg-slate-50 shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center" >
-                <div className="w-full flex flex-row justify-center">
-                    <div className="flex justify-center items-center w-4/12 bg-gray-200 p-1">ID </div>
-                    <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">{item.id} </div>
+                <div  className={!edit ? "w-full bg-slate-50 shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center" : "hidden"}> 
+                    <div className="w-full flex flex-row justify-center">
+                        <div className="flex justify-center items-center w-4/12 bg-gray-200 p-1">ID </div>
+                        <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">{item.id} </div>
+                    </div>
+                    <div className="w-full flex flex-row justify-center">
+                        <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200">UUID </div>
+                        <div className="flex justify-center items-center text-ellipsis text-nowrap overflow-hidden w-8/12 p-1 break-all bg-gray-300">{item.uuid} </div>
+                    </div>
+                    <div className="w-full flex flex-row justify-center">
+                        <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Email </div>
+                        <div className="flex justify-center items-center  w-8/12 break-all p-1 bg-gray-300 indent-3">{item.email}</div>
+                    </div>
+                    <div className="w-full flex flex-row justify-center">
+                        <div className="flex justify-center items-center w-4/12 p-1  bg-gray-200 ">Disabled </div>
+                        <div className="flex justify-center items-center w-8/12 p-1 capitalize bg-gray-300 indent-3">{item.disabled.toString()}</div>
+                    </div> 
                 </div>
-                <div className="w-full flex flex-row justify-center">
-                    <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200">UID </div>
-                    <div className="flex justify-center items-center text-ellipsis text-nowrap overflow-hidden w-8/12 p-1 break-all bg-gray-300">{item.uuid} </div>
+                {/* ### */}
+                <div key={item?.id+'-mobile-form'} className={edit ? "w-full bg-slate-50 shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center" : "hidden"}>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 bg-gray-200 p-1">ID </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300"> 
+                            <ReadOnlySingleInputNoLabel 
+                                name="id" 
+                                label="User ID"  
+                                inputType="text" 
+                                placeHolder="Admin" 
+                                value={values.id} 
+                                    /> 
+                            </div>
+                        </div>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200">UUID</div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">
+                            <ReadOnlySingleInputNoLabel 
+                                name="uuid" 
+                                label="UUID Name"  
+                                inputType="text" 
+                                placeHolder="User Identifier" 
+                                value={item?.uuid} 
+                                handler={handleInputChange.bind(this)}  />
+                            </div>
+                        </div>
+                        <div className="w-full flex flex-row  justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Email </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">
+                            <SingleInputNoLabel 
+                                name="email" 
+                                label="Email"  
+                                inputType="text" 
+                                placeHolder="Email Address" 
+                                value={values?.email} 
+                                handler={handleInputChange.bind(this)} />
+                            </div>
+                        </div>
+                        <div className="w-full flex flex-row  justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Disabled</div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">
+                                <CheckBoxInput
+                                value={values?.disabled} 
+                                label=""
+                                name="disabled"
+                                handler={handleInputChange.bind(this)}
+                                />
+                            </div>
+                        </div> 
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-1/2 p-1 bg-gray-100 ">
+                                <ErrorBoundary>
+                                    <button onClick={()=>handlePatch()} >
+                                        <UpdateIcon />
+                                    </button>
+                                </ErrorBoundary>
+                            </div>
+                            <div className="flex justify-center items-center w-1/2 p-1 bg-gray-100 indent-3">
+                                <button onClick={()=>setEdit(!edit)} >
+                                    <CancelIcon />
+                                </button>   
+                            </div>
+                        </div>                             
                 </div>
-                <div className="w-full flex flex-row justify-center">
-                    <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">email </div>
-                    <div className="flex justify-center items-center  w-8/12 break-all p-1 bg-gray-300 indent-3">{item.email}</div>
+                {/* ### */}
+                <div className={ edit ? "hidden":"w-full flex flex-row h-10 justify-center"} >
+                        <button onClick={editing} >
+                            <EditIcon />
+                        </button> 
                 </div>
-                <div className="w-full flex flex-row justify-center">
-                    <div className="flex justify-center items-center w-4/12 p-1  bg-gray-200 ">Disabled </div>
-                    <div className="flex justify-center items-center w-8/12 p-1 capitalize bg-gray-300 indent-3">{item.disabled.toString()}</div>
-                </div> 
-               
                 <div className="w-full flex flex-row h-10 justify-center" >
                     <button onClick={()=>setView(!view)}>
                     { view ? <TrayUpIcon /> : <TrayDownIcon /> }

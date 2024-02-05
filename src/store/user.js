@@ -37,7 +37,7 @@ export const useUserStore = create(
                   
                   
                 }).catch((response,error)=> {
-                    const responseError = response?.response?.data?.details
+                    const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                     toast.error(responseError,{
                         position: 'top-right'
                       })
@@ -61,7 +61,7 @@ export const useUserStore = create(
                    }))
                     
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -78,17 +78,18 @@ export const useUserStore = create(
                        'X-APP-TOKEN' : `Bearer ${token}`
                    },
                }).then(function (response) {
+                    console.log(response)
                   get().getSingleUser(user_id)
                     
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
                       
                    });
            },
-           deleteUserRole: async (user_id,role_id) => {
+        deleteUserRole: async (user_id,role_id) => {
             let token = useLogInStore.getState().access_token;
             await   blueClient.request({
                    method: 'DELETE',
@@ -101,7 +102,7 @@ export const useUserStore = create(
                   get().getSingleUser(user_id)
                     
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -146,8 +147,49 @@ export const useUserStore = create(
             }))
         },
         patchUser: async (data) => { 
-                console.log(data)
+            console.log(data)
+            let token = useLogInStore.getState().access_token;
+            await  blueClient.request({
+                   method: 'PATCH',
+                   url: `/users/${data?.id}`,
+                   headers: {
+                       'Content-Type': 'application/json',
+                       'X-APP-TOKEN' : `Bearer ${token}`
+                   },
+                   data: data
+               }).then(function (response) { 
+                               
+                    get().getSingleUser(data?.id)
+                    get().getUsers()
+                 }).catch((response,error)=> {
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                       toast.error(responseError,{
+                           position: 'top-right'
+                         })
+                      
+                   });
             },
+        postUser: async (data) => { 
+                let token = useLogInStore.getState().access_token;
+                await  blueClient.request({
+                       method: 'POST',
+                       url: `/users`,
+                       headers: {
+                           'Content-Type': 'application/json',
+                           'X-APP-TOKEN' : `Bearer ${token}`
+                       },
+                       data: data
+                   }).then(function (response) {               
+                        get().getUsers()
+                         
+                     }).catch((response,error)=> {
+                           const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                           toast.error(responseError,{
+                               position: 'top-right'
+                             })
+                          
+                       });
+                },
         activateDeactivate: async (id,status) => {
             let token = useLogInStore.getState().access_token;
            
@@ -163,7 +205,7 @@ export const useUserStore = create(
                 get().getUsers()
                 get().getSingleUser(id)
                 }).catch((response,error)=> {
-                    const responseError = response?.response?.data?.details
+                    const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                     toast.error(responseError,{
                         position: 'top-right'
                       })

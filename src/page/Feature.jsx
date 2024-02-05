@@ -1,7 +1,7 @@
 import 'chart.js/auto';
 import { data } from "../page/User"
 import { ErrorBoundary } from '../components/ErrorBoundary'
-import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon} from "../components/Icons";
+import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon, EditIcon, CancelIcon, UpdateIcon} from "../components/Icons";
 import { useEffect, Fragment, useState } from 'react';
 import { useFeatureStore } from '../store/feature';
 import { Pagination } from '../components/Pagination';
@@ -10,7 +10,7 @@ import { EndPointsDropDown } from './EndPoint';
 import { NormalButton, TabNormalButton } from '../components/Button';
 import { useStyle } from '../store/theme';
 import { Pie ,Bar } from 'react-chartjs-2';
-import { SelectInput } from "../components/Input"
+import { SelectInput, SingleInput, CheckBoxInput,ReadOnlySingleInputNoLabel,TextInputNoLabel,SingleInputNoLabel } from "../components/Input"
 import { useEndPointStore } from '../store/endpoint';
 
 export function FeaturesDropDown({ label, value  ,name, handler}){
@@ -102,15 +102,100 @@ export function EditableGetFeatureComponentMobile( {item, index} ){
     )
 }
 
-export function FeaturePage(){ 
-    const sizeDropDown= Array.from({length : 50},(_,i) => i+1)
-    const get_features = useFeatureStore((state)=>state.getFeatures)
-    const filter_value = useFeatureStore((state)=>state.filter)
-    const setFiltervalue = useFeatureStore((state)=>state.setFilterValue)
+
+export function AddFeatureForm(){
+    const post = useFeatureStore((state)=>state.postFeature)
+    const [values, setValues] = useState({
+        name: '',
+        description : '',
+        active: true
+    });
+
+    const handleClick =()=>{
+        // console.log(values)
+        post(values)
+        setValues((values) => ({
+            ...values,
+            name: '',
+            description : '',
+            active: false,
+         }));
+    }
+    
+    const handleInputChange = (event) => {
+        event.persist();
+        const target=event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        setValues((values) => ({
+           ...values,
+           [target.name] : value,
+        }));
+       
+    };
+
+
+    return(
+        <Fragment>
+           <div className="flex w-full content-center items-center justify-center h-full ">
+                <div className="flex flex-col items-center justify-center min-w-0 break-words w-full shadow-lg rounded-lg bg-gray-200 border-0">                    
+                    <div className="w-full flex-auto px-4 lg:px-10 py-3 pt-0">
+                        <form className="m-2 px-2 w-full">
+                                <div className="flex flex-col md:flex-row space-x-2 w-full" >
+                                <div></div>
+                                <SingleInput 
+                                name="name" 
+                                label="Feature Name"  
+                                inputType="text" 
+                                placeHolder="Get Users" 
+                                value={values.name} 
+                                handler={handleInputChange.bind(this)}  />
+                                <SingleInput 
+                                name="description" 
+                                label="Description"  
+                                inputType="text" 
+                                placeHolder="Description of this Feature" 
+                                value={values.description} 
+                                handler={handleInputChange.bind(this)} />
+                                <CheckBoxInput
+                                value={values.active} 
+                                label="Active"
+                                name="active"
+                                handler={handleInputChange.bind(this)}
+                                />
+                                </div>                                 
+                                <div className="flex flex-col md:flex-row space-x-2 w-full" > 
+                                <div></div> 
+                                <div className="w-full flex flex-col items-end">
+                                    <div className="w-full sm:w-3/12">
+                                    <NormalButton 
+                                    label="Add" 
+                                    handleClick={handleClick} />     
+                                    </div>
+                                </div>  
+                                </div>
+                                
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </Fragment>
+    )
+    
+} 
+
+
+export function FeaturePage(){
+     //  tailwind styling
+     const myContainer=useStyle((state)=>state.styles.componentWorkingDiv) 
+    
+     // zustand object states from store
+     const get_features = useFeatureStore((state)=>state.getFeatures)
+     const filter_value = useFeatureStore((state)=>state.filter)
+     const setFiltervalue = useFeatureStore((state)=>state.setFilterValue)
     const renderData = useFeatureStore((state)=>state.filtered_features)
+    
     //  pagination states
-
-
+    const sizeDropDown= Array.from({length : 50},(_,i) => i+1)
     const page = useFeatureStore((state)=>state.page)
     const pages = useFeatureStore((state)=>state.pages)
     const pageSize = useFeatureStore((state)=>state.size)
@@ -131,7 +216,7 @@ export function FeaturePage(){
     };
 
     return (
-        <>
+        <div className={myContainer}>
 
         <title>Features</title>
         <ErrorBoundary>
@@ -144,6 +229,11 @@ export function FeaturePage(){
             <Bar data={data} height="70%" options={{ maintainAspectRatio: false }} />
             </div>
         </div>
+        </ErrorBoundary>
+        <ErrorBoundary>
+        <div className="bg-zinc-100 h-auto  shadow-lg w-full text-sm">
+                <AddFeatureForm />
+            </div>
         </ErrorBoundary>
         <ErrorBoundary>
         <div className="w-full flex items-stretch  justify-start h-full">
@@ -218,7 +308,7 @@ export function FeaturePage(){
                 </div>        
             </div>
         </ErrorBoundary>
-        </>
+        </div>
     )
 }
 
@@ -327,11 +417,47 @@ export function AddEndPointToFeatureForm( {feature_id } ){
 
 export function EditableSingleFeatureComponent( {item} ){
     const [tabToken,setTabToken]=useState(1)
-  
+    const [edit,setEdit]=useState(false)
+    const patch = useFeatureStore((state)=>state.patchFeature)
+    const [values, setValues] = useState({
+        id: '',
+        name: '',
+        description : '',
+        active: ''
+    });
+
+    const editing=()=>{
+        setEdit(!edit)
+        setValues((values) => ({
+            ...values,
+            id : item?.id,
+            name: item?.name,
+            description: item?.description,
+            active : item?.active
+            }));
+    
+    }
+    const handlePatch =()=>{
+        
+        patch(values)
+        setEdit(false)
+    }
+    
+    const handleInputChange = (event) => {
+        event.persist();
+        const target=event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        setValues((values) => ({
+           ...values,
+           [target.name] : value,
+        }));
+       
+    };
+
     if (item != null) {
     return (
     <Fragment key={'form-row'+item.id}>
-        <div  className="w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto">
+        <div  className={edit ? "hidden":"w-full  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto"}>
             <div className="flex bg-gray-50 w-1/12 justify-center items-center">
                 <p>{item.id}</p>
             </div>
@@ -342,9 +468,72 @@ export function EditableSingleFeatureComponent( {item} ){
                 <p> {item.description}</p>
             </div>
             <div className="flex justify-center capitalize items-center bg-gray-50 w-3/12 ">
-                <p> {item.active.toString()}</p>
+                    <div  className="w-8/12  flex flex-row space-x-1 my-auto items-stretch justify-center h-auto">
+                        <p> {item?.active.toString()}</p>
+                    </div>
+                    <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
+                        <div className="w-full flex justify-center items-center">
+                            <button onClick={editing}>
+                                <EditIcon />
+                            </button>
+                        </div>
+                    </div>
+
             </div>
         </div>
+        <ErrorBoundary>
+            <div  className={edit ? "w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
+                <div className="flex bg-gray-50 w-1/12 justify-center items-center">
+                    <ReadOnlySingleInputNoLabel 
+                        name="id" 
+                        label="Feature ID"  
+                        inputType="text" 
+                        placeHolder="Admin" 
+                        value={values.id} 
+                            />
+                </div>
+                <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-4/12 overflow-hidden">
+                    <SingleInputNoLabel 
+                        name="name" 
+                        label="Feature Name"  
+                        inputType="text" 
+                        placeHolder="Admin" 
+                        value={values.name} 
+                        handler={handleInputChange.bind(this)}  />
+                </div>
+                <div className="flex justify-center items-center break-all bg-gray-50 w-4/12 text-ellipsis">
+                    <TextInputNoLabel 
+                        name="description" 
+                        label="Description"  
+                        inputType="text" 
+                        placeHolder="What you can do with feature" 
+                        value={values.description} 
+                        handler={handleInputChange.bind(this)} />
+                </div>
+                <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
+                    <div className="flex justify-center items-center h-full w-4/12 bg-gray-100">
+                        <CheckBoxInput
+                            value={values.active} 
+                            label=""
+                            name="active"
+                            handler={handleInputChange.bind(this)}
+                            />
+                    </div>
+                    <div className="flex justify-center items-center w-4/12 bg-gray-50">
+                        <ErrorBoundary>
+                            <button onClick={()=>handlePatch()} >
+                                <UpdateIcon />
+                            </button>
+                        </ErrorBoundary>
+                    </div>
+                    <div className="flex justify-center items-center w-4/12 bg-gray-50">
+                        <button onClick={()=>setEdit(!edit)} >
+                            <CancelIcon />
+                        </button>                            
+                    </div>
+                </div>
+            </div>        
+        </ErrorBoundary>
         <br/>
         <div className="w-full flex items-stretch justify-start h-full ">
             <div className="w-full tabs">
@@ -448,11 +637,11 @@ export function EditableSingleFeatureComponent( {item} ){
                                                                                                           
                                  item?.endpoints?.map((endpoint,index)=>{
                                     return (
-                                        <div key={index+endpoint?.name} className="flex w-2/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                            <div className="w-9/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
+                                        <div key={index+endpoint?.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                            <div className="w-10/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
                                                 <p className="text-ellipsis">{endpoint?.name}</p>
                                             </div>
-                                            <div className="w-3/12 flex items-center justify-center bg-slate-300">
+                                            <div className="w-2/12 flex items-center justify-center bg-slate-300">
                                                 <ErrorBoundary>
                                                 <DeleteFeatureEndpointButton endpoint_id={endpoint.id} feature_id={item.id} />
                                                 </ErrorBoundary>
@@ -539,8 +728,42 @@ export function EditableSingleFeatureComponent( {item} ){
 
 export function EditableSingleFeatureComponentMobile({item}){
     const [tabToken,setTabToken]=useState(1) 
-     
     const [view,setView]=useState(false)
+    const [edit,setEdit]=useState(false)
+    const patch = useFeatureStore((state)=>state.patchFeature)
+    const [values, setValues] = useState({
+        id: '',
+        name: '',
+        description : '',
+        active: ''
+    });
+
+    const handleInputChange = (event) => {
+        event.persist();
+        const target=event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        setValues((values) => ({
+           ...values,
+           [target.name] : value,
+        }));
+       
+    };
+    const editing=()=>{
+        setEdit(!edit)
+        setValues((values) => ({
+            ...values,
+            id : item?.id,
+            name: item?.name,
+            description: item?.description,
+            active : item?.active
+            }));
+    
+    }
+    const handlePatch =()=>{
+        // console.log(values)
+        patch(values)
+        setEdit(false)
+    }
   
     if (item != null){
 
@@ -548,6 +771,8 @@ export function EditableSingleFeatureComponentMobile({item}){
         <Fragment key={'mobile-form-row'+item.id}>                   
             {/* # */}
             <div key={item.id+'-mobile'} className="w-full bg-slate-50 shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center" >
+                <div  className={!edit ? "w-full bg-slate-50 shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center" : "hidden"}>
+                            
                 <div className="w-full flex flex-row justify-center">
                     <div className="flex justify-center items-center w-4/12 bg-gray-200 p-1">ID </div>
                     <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">{item.id} </div>
@@ -561,10 +786,80 @@ export function EditableSingleFeatureComponentMobile({item}){
                     <div className="flex justify-center items-center  w-8/12 break-all p-1 bg-gray-300 indent-3">{item?.description}</div>
                 </div>
                 <div className="w-full flex flex-row justify-center">
-                    <div className="flex justify-center items-center w-4/12 p-1  bg-gray-200 ">Disabled </div>
+                    <div className="flex justify-center items-center w-4/12 p-1  bg-gray-200 ">Active</div>
                     <div className="flex justify-center items-center w-8/12 p-1 capitalize bg-gray-300 indent-3">{item?.active.toString()}</div>
                 </div> 
-               
+                </div>
+               {/* #### */}
+               <div key={item?.id+'-mobile-form'} className={edit ? "w-full bg-slate-50 shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center" : "hidden"}>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 bg-gray-200 p-1">ID </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300"> 
+                            <ReadOnlySingleInputNoLabel 
+                                name="id" 
+                                label="Feature ID"  
+                                inputType="text" 
+                                placeHolder="Admin" 
+                                value={values.id} 
+                                    /> 
+                            </div>
+                        </div>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200">Role </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">
+                            <SingleInputNoLabel 
+                                name="name" 
+                                label="Feature Name"  
+                                inputType="text" 
+                                placeHolder="Get Users" 
+                                value={values.name} 
+                                handler={handleInputChange.bind(this)}  />
+                            </div>
+                        </div>
+                        <div className="w-full flex flex-row  justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Description </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">
+                            <TextInputNoLabel 
+                                name="description" 
+                                label="Description"  
+                                inputType="text" 
+                                placeHolder="Feature summary" 
+                                value={values.description} 
+                                handler={handleInputChange.bind(this)} />
+                            </div>
+                        </div>
+                        <div className="w-full flex flex-row  justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Active</div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">
+                                <CheckBoxInput
+                                value={values.active} 
+                                label=""
+                                name="active"
+                                handler={handleInputChange.bind(this)}
+                                />
+                            </div>
+                        </div> 
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-1/2 p-1 bg-gray-100 ">
+                                <ErrorBoundary>
+                                    <button onClick={()=>handlePatch()} >
+                                        <UpdateIcon />
+                                    </button>
+                                </ErrorBoundary>
+                            </div>
+                            <div className="flex justify-center items-center w-1/2 p-1 bg-gray-100 indent-3">
+                                <button onClick={()=>setEdit(!edit)} >
+                                    <CancelIcon />
+                                </button>   
+                            </div>
+                        </div>                             
+                    </div>
+               {/* ### */}
+                <div className={ edit ? "hidden":"w-full flex flex-row h-10 justify-center"} >
+                        <button onClick={editing} >
+                            <EditIcon />
+                        </button> 
+                </div>
                 <div className="w-full flex flex-row h-10 justify-center" >
                     <button onClick={()=>setView(!view)}>
                     { view ? <TrayUpIcon /> : <TrayDownIcon /> }

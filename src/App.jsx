@@ -8,11 +8,13 @@ import { SingleUsersSection, UserPage } from './page/User'
 import { EndPointPage } from './page/EndPoint'
 import { SignUpPage } from './page/SignUp'
 import { FeaturePage, SingleFeaturesSection } from './page/Feature'
-import { BlueAppPage } from './page/BlueApp'
+import { BlueApp } from './page/BlueApp'
+import { BluePage } from './page/BluePage'
 import { RolePage, SingleRolesSection } from './page/Role'
 import { useStyle } from './store/theme'
 import { useLogInStore } from './store/login'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { VideoStream } from './page/Stream'
 
 // npx tailwindcss -i ./src/index.css -m -o ./src/main.css 
 // npx tailwindcss -i ./src/main.css -m -o ../static/css/main.min.css --watch
@@ -50,10 +52,16 @@ function App() {
 			href="/app"	 onClick={null}> App
 			</a>
 			<a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
+			href="/page"	 onClick={null}> Pages
+			</a>
+			<a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
 			href="/endpoint"	 onClick={null}> End Points
 			</a>
 			<a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
 			href="/login"	 onClick={null}> Log In
+			</a>
+			<a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
+			href="/stream"	 onClick={null}> Video
 			</a>
 			<a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
 			href="/signup"	 onClick={null}> Sign Up
@@ -81,7 +89,9 @@ function App() {
           <Route path="/feature" element={<FeaturePage /> } />
 		  <Route path="/feature/:id" element={<SingleFeaturesSection />} />
           <Route path="/endpoint" element={<EndPointPage /> } />  
-          <Route path="/app" element={<BlueAppPage />} />
+          <Route path="/page" element={<BluePage />} />
+		  <Route path="/app" element={<BlueApp />} />
+		  <Route path="/stream" element={<VideoStream /> } /> 
           </Routes>
           <Toaster />
           </div>    

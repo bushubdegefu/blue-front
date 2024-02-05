@@ -39,7 +39,7 @@ export const useFeatureStore = create(
                   
                   
                 }).catch((response,error)=> {
-                    const responseError = response?.response?.data?.details
+                    const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                     toast.error(responseError,{
                         position: 'top-right'
                       })
@@ -66,7 +66,7 @@ export const useFeatureStore = create(
                      
                      
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -91,7 +91,7 @@ export const useFeatureStore = create(
                    }))
                     
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -113,7 +113,7 @@ export const useFeatureStore = create(
                   update_role(role_id)
                     
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -134,7 +134,7 @@ export const useFeatureStore = create(
                   get().getSingleFeature(feature_id)
                   update_role(role_id)  
                    }).catch((response,error)=> {
-                       const responseError = response?.response?.data?.details
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
                            position: 'top-right'
                          })
@@ -179,8 +179,47 @@ export const useFeatureStore = create(
             }))
         },
         patchFeature: async (data) => { 
-                console.log(data)
+            let token = useLogInStore.getState().access_token;
+            await  blueClient.request({
+                   method: 'PATCH',
+                   url: `/features/${data?.id}`,
+                   headers: {
+                       'Content-Type': 'application/json',
+                       'X-APP-TOKEN' : `Bearer ${token}`
+                   },
+                   data: data
+               }).then(function (response) {           
+                    get().getSingleFeature(data?.id)
+                    get().getFeatures()
+                 }).catch((response,error)=> {
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                       toast.error(responseError,{
+                           position: 'top-right'
+                         })
+                      
+                   });
             },
+        postFeature: async (data) => { 
+                let token = useLogInStore.getState().access_token;
+                await  blueClient.request({
+                       method: 'POST',
+                       url: `/features`,
+                       headers: {
+                           'Content-Type': 'application/json',
+                           'X-APP-TOKEN' : `Bearer ${token}`
+                       },
+                       data: data
+                   }).then(function (response) {               
+                        get().getFeatures()
+                         
+                     }).catch((response,error)=> {
+                           const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                           toast.error(responseError,{
+                               position: 'top-right'
+                             })
+                          
+                       });
+                },
         activateDeactivate: async (id,status) => {
             let token = useLogInStore.getState().access_token;
            
@@ -196,7 +235,7 @@ export const useFeatureStore = create(
                 get().getFeatures()
                 get().getSingleFeature(id)
                 }).catch((response,error)=> {
-                    const responseError = response?.response?.data?.details
+                    const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                     toast.error(responseError,{
                         position: 'top-right'
                       })

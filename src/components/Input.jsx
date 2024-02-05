@@ -53,7 +53,7 @@ export function CheckBoxInput({label,name,handler, value}){
    <div>
         <label className="inline-flex items-center cursor-pointer">
             <input name={name}  aria-label={label} value={value} checked={value} onChange={handler ? handler : null}  type="checkbox" className="form-checkbox border-0 rounded text-gray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150" />
-            <span className="ml-2 text-sm font-semibold text-gray-600">{label}</span>
+            <span className={label ? "ml-2 text-sm font-semibold text-gray-600" : "hidden"}>{label}</span>
         </label>
     </div>
     )
@@ -98,7 +98,7 @@ export function TextInputNoLabel({ label, inputType, placeHolder,name, value, ha
     return(
 
         <div className="relative w-full flex justify-center items-center">
-            <textarea name={name} type={inputType} onChange={handler} aria-label={label} className="border-0 resize-y px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-11/12 ease-linear transition-all duration-150" placeholder={placeHolder}  value={value}/>
+            <textarea name={name} type={inputType} onChange={handler} aria-label={label} className="border-0 resize-y px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" placeholder={placeHolder}  value={value}/>
         </div>
 
     )

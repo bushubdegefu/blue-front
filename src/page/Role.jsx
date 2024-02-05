@@ -1,6 +1,6 @@
-import { SelectInput } from "../components/Input"
+import { SelectInput, ReadOnlySingleInputNoLabel,SingleInputNoLabel,TextInputNoLabel,SingleInput } from "../components/Input"
 import { ErrorBoundary } from '../components/ErrorBoundary'
-import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon} from "../components/Icons";
+import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon, EditIcon, CancelIcon,UpdateIcon } from "../components/Icons";
 import { useEffect, Fragment, useState } from 'react';
 import { useRoleStore } from '../store/role';
 import { Pagination } from '../components/Pagination';
@@ -102,16 +102,92 @@ export function EditableGetRoleComponentMobile( {item, index} ){
             </Fragment>
         )
     }
+export function AddRolesForm(){
+        const post = useRoleStore((state)=>state.postRole)
+        const [values, setValues] = useState({
+            name: '',
+            description : '',
+        });
     
+        const handleClick =()=>{
+            // console.log(values)
+            post(values)
+            setValues((values) => ({
+                ...values,
+                name: '',
+                description : '',
+             }));
+            
+        }
+        
+        const handleInputChange = (event) => {
+            event.persist();
+            const target=event.target
+            const value = target.type === 'checkbox' ? target.checked : target.value;
+            setValues((values) => ({
+               ...values,
+               [target.name] : value,
+            }));
+           
+        };
+    
+    
+        return(
+            <Fragment>
+               <div className="flex w-full content-center items-center justify-center h-full ">
+                    <div className="flex flex-col items-center justify-center min-w-0 break-words w-full shadow-lg rounded-lg bg-gray-200 border-0">                    
+                        <div className="w-full flex-auto px-4 lg:px-10 py-3 pt-0">
+                            <form className="m-2 px-2 w-full">
+                                    <div className="flex flex-col md:flex-row space-x-2 w-full" >
+                                    <div></div>
+                                    <SingleInput 
+                                    name="name" 
+                                    label="Role Name"  
+                                    inputType="text" 
+                                    placeHolder="Admin" 
+                                    value={values.name} 
+                                    handler={handleInputChange.bind(this)}  />
+                                    <SingleInput 
+                                    name="description" 
+                                    label="Description"  
+                                    inputType="text" 
+                                    placeHolder="HR Administrator" 
+                                    value={values.description} 
+                                    handler={handleInputChange.bind(this)} />
+                                    </div>                                 
+                                    <div className="flex flex-col md:flex-row space-x-2 w-full" > 
+                                    <div></div> 
+                                    <div className="w-full flex flex-col items-end">
+                                        <div className="w-full sm:w-3/12">
+                                        <NormalButton 
+                                        label="Add Role" 
+                                        handleClick={handleClick} />     
+                                        </div>
+                                    </div>  
+    
+                                    </div>
+                                    
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </Fragment>
+        )
+        
+    } 
 export function RolePage(){ 
+        //  tailwind styling
+        const myContainer=useStyle((state)=>state.styles.componentWorkingDiv) 
+        //  pagination dropdown options
         const sizeDropDown= Array.from({length : 50},(_,i) => i+1)
+        
+        // states from zustand store
         const get_pages = useRoleStore((state)=>state.getRoles)
         const filter_value = useRoleStore((state)=>state.filter)
         const setFiltervalue = useRoleStore((state)=>state.setFilterValue)
         const renderData = useRoleStore((state)=>state.filtered_roles)
-        //  pagination states
-    
-    
+        
+        //  pagination states   
         const page = useRoleStore((state)=>state.page)
         const pages = useRoleStore((state)=>state.pages)
         const pageSize = useRoleStore((state)=>state.size)
@@ -121,8 +197,7 @@ export function RolePage(){
         
     
         useEffect(()=>{
-            get_pages()
-            
+            get_pages()    
         },[])
     
         const handleInputChange = (event) => {
@@ -132,11 +207,11 @@ export function RolePage(){
         };
     
         return (
-            <>
+            <div className={myContainer}>
     
             <title>Roles</title>
             <ErrorBoundary>
-            <div className="w-full  h-72 flex flex-col overflow-y-scroll scrollbar-none md:flex-row items-stretch justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
+            <div className="w-full  h-96 flex flex-col overflow-y-scroll scrollbar-none md:flex-row items-stretch justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
                 <div className=' flex w-full md:w-6/12  h-full items-center justify-center'>
                
                 <Pie data={data} height="65%" options={{ maintainAspectRatio: false }}/>
@@ -144,6 +219,11 @@ export function RolePage(){
                 <div className='flex w-full md:w-6/12  h-full items-center justify-center'>
                 <Bar data={data} height="70%" options={{ maintainAspectRatio: false }} />
                 </div>
+            </div>
+            </ErrorBoundary>
+            <ErrorBoundary>
+            <div className="bg-zinc-100 h-auto  shadow-lg w-full text-sm">
+                <AddRolesForm />
             </div>
             </ErrorBoundary>
             <ErrorBoundary>
@@ -219,7 +299,7 @@ export function RolePage(){
                     </div>        
                 </div>
             </ErrorBoundary>
-            </>
+            </div>
         )
     }
 //  Single Role Page Components Down from here
@@ -324,14 +404,64 @@ export function AddFeatureToRoleForm( {role_id} ){
         
     }
     
+function PatchRoleButton({ patch_data,cancel }){
+
+        const patch = useRoleStore((state)=>state.patchRole)
+        const patchRole = () => { 
+                patch(patch_data)
+                cancel(false)
+        }    
+        
+        return (
+            <button onClick={()=>patchRole()} >
+                <UpdateIcon />
+            </button>
+            )  
+        
     
-export function EditableSingleRoleComponent( {item , endpoints} ){
+    }  
+    
+export function EditableSingleRoleComponent( {id , endpoints} ){
         const [tabToken,setTabToken]=useState(1)
-      
+        const item = useRoleStore((state)=>state.role)
+        const getSingleRole = useRoleStore((state)=>state.getSingleRole)
+        const [edit,setEdit]=useState(false)
+        const [values, setValues] = useState({
+            id : "",
+            name: "",
+            description : "",
+        });
+        
+        const handleInputChange = (event) => {
+            event.persist();
+            const target=event.target
+            const value = target.type === 'checkbox' ? target.checked : target.value;
+            setValues((values) => ({
+               ...values,
+               [target.name] : value,
+            }));
+        };
+
+        const editing=()=>{
+            setEdit(!edit)
+            setValues((values) => ({
+                ...values,
+                id : item?.id,
+                name: item?.name,
+                description: item?.description
+                }));
+        
+        }
+        
+        useEffect(()=>{
+            getSingleRole(id)    
+        },[])
+
         if (item != null) {
+        // firstInit()
         return (
         <Fragment key={'form-row'+item.id}>
-            <div  className="w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto">
+            <div  className={!edit ? "w-full  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto": "hidden"}>
                 <div className="flex bg-gray-50 w-1/12 justify-center items-center">
                     <p>{item?.id}</p>
                 </div>
@@ -342,9 +472,61 @@ export function EditableSingleRoleComponent( {item , endpoints} ){
                     <p> {item?.description}</p>
                 </div>
                 <div className="flex justify-center capitalize items-center bg-gray-50 w-3/12 ">
-                    <p> {item?.active.toString()}</p>
+                    <div  className="w-8/12  flex flex-row space-x-1 my-auto items-stretch justify-center h-auto">
+                        <p> {item?.active.toString()}</p>
+                    </div>
+                    <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
+                        <div className="w-full flex justify-center items-center">
+                            <button onClick={editing}>
+                                <EditIcon />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <ErrorBoundary>
+            <div  className={edit ? "w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
+                <div className="flex bg-gray-50 w-1/12 justify-center items-center">
+                    <ReadOnlySingleInputNoLabel 
+                        name="id" 
+                        label="Role ID"  
+                        inputType="text" 
+                        placeHolder="Admin" 
+                        value={values.id} 
+                            />
+                </div>
+                <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-4/12 overflow-hidden">
+                    <SingleInputNoLabel 
+                        name="name" 
+                        label="Role Name"  
+                        inputType="text" 
+                        placeHolder="Admin" 
+                        value={values.name} 
+                        handler={handleInputChange.bind(this)}  />
+                </div>
+                <div className="flex justify-center items-center break-all bg-gray-50 w-4/12 text-ellipsis">
+                    <TextInputNoLabel 
+                        name="description" 
+                        label="Description"  
+                        inputType="text" 
+                        placeHolder="HR Administrator" 
+                        value={values.description} 
+                        handler={handleInputChange.bind(this)} />
+                </div>
+                <div className="flex justify-center capitalize items-center bg-gray-50 w-3/12 ">
+                    <div className="flex justify-center items-center w-6/12 bg-gray-50">
+                        <ErrorBoundary>
+                            <PatchRoleButton patch_data={values} cancel={setEdit} />
+                        </ErrorBoundary>
+                    </div>
+                    <div className="flex justify-center items-center w-6/12 bg-gray-50">
+                        <button onClick={()=>setEdit(!edit)} >
+                            <CancelIcon />
+                        </button>                            
+                    </div>
+                </div>
+            </div>        
+            </ErrorBoundary>
             <br/>
             <div className="w-full flex items-stretch justify-start h-full ">
                 <div className="w-full tabs">
@@ -451,11 +633,11 @@ export function EditableSingleRoleComponent( {item , endpoints} ){
                                                                           
                                  item?.features?.map((feature,index)=>{
                                     return (
-                                        <div key={index+feature?.name} className="flex w-2/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                            <div className="w-9/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
+                                        <div key={index+feature?.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                            <div className="w-10/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
                                                 <p className="text-ellipsis">{feature?.name}</p>
                                             </div>
-                                            <div className="w-3/12 flex items-center justify-center bg-slate-300">
+                                            <div className="w-2/12 flex items-center justify-center bg-slate-300">
                                                 <ErrorBoundary>
                                                     <DeleteRoleFeatureButton feature_id={feature?.id} role_id={item?.id} />
                                                 </ErrorBoundary>
@@ -560,39 +742,132 @@ export function EditableSingleRoleComponent( {item , endpoints} ){
         return ""
     }
     
-export function EditableSingleRoleComponentMobile({item, endpoints}){
+export function EditableSingleRoleComponentMobile({id, endpoints}){
         const [tabToken,setTabToken]=useState(1) 
-         
+        const item = useRoleStore((state)=>state.role)
         const [view,setView]=useState(false)
-      
+        const getSingleRole = useRoleStore((state)=>state.getSingleRole)
+        const [edit,setEdit]=useState(false)
+        const [values, setValues] = useState({
+            id : "",
+            name: "",
+            description : "",
+        });
+        
+        const handleInputChange = (event) => {
+            event.persist();
+            const target=event.target
+            const value = target.type === 'checkbox' ? target.checked : target.value;
+            setValues((values) => ({
+               ...values,
+               [target.name] : value,
+            }));
+        };
+        
+        const editing=()=>{
+            setEdit(!edit)
+            setValues((values) => ({
+                ...values,
+                id : item?.id,
+                name: item?.name,
+                description: item?.description
+                }));
+        
+        }
+        useEffect(()=>{
+            getSingleRole(id)
+        },[])
+        
         if (item != null){
            
            return (
             <Fragment key={'mobile-form-row'+item?.id}>                   
                 {/* # */}
                 <div key={item?.id+'-mobile'} className="w-full bg-slate-50 shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center" >
-                    <div className="w-full flex flex-row justify-center">
-                        <div className="flex justify-center items-center w-4/12 bg-gray-200 p-1">ID </div>
-                        <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">{item?.id} </div>
-                    </div>
-                    <div className="w-full flex flex-row justify-center">
-                        <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200">Name </div>
-                        <div className="flex justify-center items-center text-ellipsis text-nowrap overflow-hidden w-8/12 p-1 break-all bg-gray-300">{item?.name} </div>
-                    </div>
-                    <div className="w-full flex flex-row justify-center">
-                        <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Description </div>
-                        <div className="flex justify-center items-center  w-8/12 break-all p-1 bg-gray-300 indent-3">{item?.description}</div>
-                    </div>
-                    <div className="w-full flex flex-row justify-center">
-                        <div className="flex justify-center items-center w-4/12 p-1  bg-gray-200 ">Disabled </div>
-                        <div className="flex justify-center items-center w-8/12 p-1 capitalize bg-gray-300 indent-3">{item?.active.toString()}</div>
+                    <div  className={!edit ? "w-full bg-slate-50 shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center" : "hidden"}>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 bg-gray-200 p-1">ID </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">{item?.id} </div>
+                        </div>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200">Name </div>
+                            <div className="flex justify-center items-center text-ellipsis text-nowrap overflow-hidden w-8/12 p-1 break-all bg-gray-300">{item?.name} </div>
+                        </div>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Description </div>
+                            <div className="flex justify-center items-center  w-8/12 break-all p-1 bg-gray-300 indent-3">{item?.description}</div>
+                        </div>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1  bg-gray-200 ">Disabled </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 capitalize bg-gray-300 indent-3">{item?.active.toString()}</div>
+                        </div>
                     </div> 
-                   
+                   {/* ### */}
+                   <div key={item?.id+'-mobile-form'} className={edit ? "w-full bg-slate-50 shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center" : "hidden"}>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 bg-gray-200 p-1">ID </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300"> 
+                            <ReadOnlySingleInputNoLabel 
+                                name="id" 
+                                label="Role ID"  
+                                inputType="text" 
+                                placeHolder="Admin" 
+                                value={values.id} 
+                                    /> 
+                            </div>
+                        </div>
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200">Role </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">
+                            <SingleInputNoLabel 
+                                name="name" 
+                                label="Role Name"  
+                                inputType="text" 
+                                placeHolder="Admin" 
+                                value={values.name} 
+                                handler={handleInputChange.bind(this)}  />
+                            </div>
+                        </div>
+                        <div className="w-full flex flex-row  justify-center">
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Description </div>
+                            <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">
+                            <TextInputNoLabel 
+                                name="description" 
+                                label="Description"  
+                                inputType="text" 
+                                placeHolder="HR Administrator" 
+                                value={values.description} 
+                                handler={handleInputChange.bind(this)} />
+                            </div>
+                        </div> 
+                        <div className="w-full flex flex-row justify-center">
+                            <div className="flex justify-center items-center w-1/2 p-1 bg-gray-100 ">
+                                <ErrorBoundary>
+                                    <PatchRoleButton patch_data={values} cancel={setEdit}/>
+                                </ErrorBoundary>
+                            </div>
+                            <div className="flex justify-center items-center w-1/2 p-1 bg-gray-100 indent-3">
+                                <button onClick={()=>setEdit(!edit)} >
+                                    <CancelIcon />
+                                </button>   
+                            </div>
+                        </div>                             
+                    </div>
+                   {/* ### */}
+                   <div className={ edit ? "hidden":"w-full flex flex-row h-10 justify-center"} >
+                        <button onClick={editing} >
+                            <EditIcon />
+                        </button> 
+                    </div>
                     <div className="w-full flex flex-row h-10 justify-center" >
                         <button onClick={()=>setView(!view)}>
                         { view ? <TrayUpIcon /> : <TrayDownIcon /> }
                         </button>
-                    </div> 
+                    </div>
+        
+                    {/* <div className="flex justify-center items-center w-1/2 p-1 bg-gray-100 ">
+                        
+                    </div>  */}
                 
                     <div className={ view ? "w-full flex flex-row justify-center" : "hidden" }>
                     <div className="w-full tabs">
@@ -739,10 +1014,10 @@ export function SingleRolesSection( ){
         const getSingleRole = useRoleStore((state)=>state.getSingleRole)
         const getRoleEndpoints = useRoleStore((state)=>state.getRoleEndpoints)
         const endpoints = useRoleStore((state)=>state.endpoints)
-        const item = useRoleStore((state)=>state.role)
+           
+
         const { id } = useParams()
         useEffect(()=>{
-            getSingleRole(id)
             getRoleEndpoints(id)
         },[])
         return(
@@ -779,13 +1054,13 @@ export function SingleRolesSection( ){
                             
                         </div>
                         <ErrorBoundary>
-                            <EditableSingleRoleComponent id={id} item={item} endpoints={endpoints}  />
+                            <EditableSingleRoleComponent id={id} endpoints={endpoints}  />
                         </ErrorBoundary> 
                         </div>
                         <div className="mobile-block md:hidden w-full flex-auto px-4 lg:px-10 py-10 pt-0">            
                             <div className="w-full flex flex-col items-stretch h-auto space-y-1"> 
                                 <ErrorBoundary>
-                                    <EditableSingleRoleComponentMobile id={id}  item={item} endpoints={endpoints} />
+                                    <EditableSingleRoleComponentMobile id={id}  endpoints={endpoints} />
                                 </ErrorBoundary>      
                             </div>
                         </div>

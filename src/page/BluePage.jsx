@@ -3,18 +3,18 @@ import { data } from "../page/User"
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon, EditIcon, UpdateIcon, CancelIcon} from "../components/Icons";
 import { useEffect, Fragment, useState } from 'react';
-import { useEndPointStore } from '../store/endpoint';
+import { usePageStore } from '../store/page';
 import { Pagination } from '../components/Pagination';
 import { useParams } from "react-router-dom";
 import { RolesDropDown } from './Role';
 import { NormalButton, TabNormalButton } from '../components/Button';
 import { useStyle } from '../store/theme';
 import { Pie ,Bar } from 'react-chartjs-2';
-import { SelectInput, SingleInput,ReadOnlySingleInputNoLabel,SingleInputNoLabel } from "../components/Input"
+import { SelectInput, SingleInput, ReadOnlySingleInputNoLabel, SingleInputNoLabel, CheckBoxInput } from "../components/Input"
 
-export function EndPointsDropDown({ label, value  ,name, handler}){
-    const items = useEndPointStore((state)=>state.drop_endpoints)
-    const getItems = useEndPointStore((state)=>state.getDropEndPoints)   
+export function PagesDropDown({ label, value  ,name, handler}){
+    const items = usePageStore((state)=>state.drop_pages)
+    const getItems = usePageStore((state)=>state.getDropPages)   
     
   
     useEffect(()=>{
@@ -34,22 +34,21 @@ export function EndPointsDropDown({ label, value  ,name, handler}){
 }
 
 
-export function AddEndpointForm(){
-    const post = useEndPointStore((state)=>state.postEndpoint)
+export function AddPageForm(){
+    const postPage = usePageStore((state)=>state.postPage)
     const [values, setValues] = useState({
         name: '',
         description : '',
-        route_path: ''
+        
     });
 
     const handleClick =()=>{
-        // console.log(values)
-        post(values)
+      
+        postPage(values)
         setValues((values) => ({
             ...values,
             name: '',
             description : '',
-            route_path: ''
          }));
     }
     
@@ -75,7 +74,7 @@ export function AddEndpointForm(){
                                 <div></div>
                                 <SingleInput 
                                 name="name" 
-                                label="Endpoint Name"  
+                                label="Page Name"  
                                 inputType="text" 
                                 placeHolder="Get Users" 
                                 value={values.name} 
@@ -87,12 +86,6 @@ export function AddEndpointForm(){
                                 placeHolder="Description of this Feature" 
                                 value={values.description} 
                                 handler={handleInputChange.bind(this)} />
-                                <SingleInput
-                                value={values.route_path} 
-                                label="Enpoint"
-                                name="route_path"
-                                handler={handleInputChange.bind(this)}
-                                />
                                 </div>                                 
                                 <div className="flex flex-col md:flex-row space-x-2 w-full" > 
                                 <div></div> 
@@ -114,16 +107,16 @@ export function AddEndpointForm(){
     
 }
 
-export function EditableGetEndPointComponent( {item, index} ){
+export function EditableGetPageComponent( {item, index} ){
     
     const [edit,setEdit]=useState(false)
-    const patch = useEndPointStore((state)=>state.patchEndpoint)
-    const deleteEnd = useEndPointStore((state)=>state.deleteEndpoint)
+    const patch = usePageStore((state)=>state.patchPage)
+    const deleteEnd = usePageStore((state)=>state.deletePage)
     const [values, setValues] = useState({
         id: '',
         name: '',
         description : '',
-        route_path: ''
+        active: ''
     });
 
     const editing=()=>{
@@ -133,7 +126,7 @@ export function EditableGetEndPointComponent( {item, index} ){
             id : item?.id,
             name: item?.name,
             description: item?.description,
-            route_path : item.route_path ? item?.route_path : ""
+            active: item?.active
             }));
     
     }
@@ -154,6 +147,7 @@ export function EditableGetEndPointComponent( {item, index} ){
        
     };
 
+   
     return (
     <Fragment key={'form-row'+index}>
 
@@ -161,24 +155,24 @@ export function EditableGetEndPointComponent( {item, index} ){
             <div className="flex bg-gray-50 w-1/12 rounded-tl-lg justify-center items-center">
                 <p>{item?.id}</p>
             </div>
-            <div className="flex justify-center text-ellipsis text-nowrap items-center break-all bg-gray-50 w-3/12">
+            <div className="flex justify-center text-ellipsis text-nowrap items-center break-all bg-gray-50 w-4/12">
                 <p className="p-3  text-ellipsis ">{item?.name}</p>
             </div>
-            <div className="flex justify-center items-center break-all text-nowrap bg-gray-50 w-3/12 text-ellipsis">
+            <div className="flex justify-center items-center break-all text-nowrap bg-gray-50 w-4/12 text-ellipsis">
                 <p> {item?.description}</p>
             </div>
-            <div className="flex justify-center items-center break-all text-nowrap bg-gray-50 w-3/12 text-ellipsis o">
-                <p> {item?.route_path}</p>
-            </div>
-            <div className="flex capitalize justify-stretch items-stretch bg-gray-50 w-2/12 ">
-                <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
+            <div className="flex capitalize justify-stretch items-stretch bg-gray-50 w-3/12 ">
+                <div  className={"w-4/12  flex flex-row space-x-1 my-auto items-center justify-center h-full bg-gray-100 shadow-2xl " +`${item?.active ? "text-green-700 font-bold" :"text-red-700 font-bold"}`}>
+                        <p> {item?.active.toString()}</p>
+                </div>
+                <div  className="w-4/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
                     <div className="w-full flex justify-center items-center">
                         <button onClick={editing}>
                             <EditIcon />
                         </button>
                     </div>
                 </div>
-                <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
+                <div  className="w-4/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
                     <div className="w-full flex justify-center items-center">
                         <button onClick={()=>deleteEnd(item?.id)}>
                             <TrashIcon />
@@ -193,40 +187,40 @@ export function EditableGetEndPointComponent( {item, index} ){
                 <div className="flex bg-gray-50 w-1/12 justify-center items-center">
                     <ReadOnlySingleInputNoLabel 
                         name="id" 
-                        label="Endpoint ID"  
+                        label="Page ID"  
                         inputType="text" 
                         placeHolder="Admin" 
                         value={values.id} 
                             />
                 </div>
-                <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-3/12 overflow-hidden">
+                <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-4/12 overflow-hidden">
                     <SingleInputNoLabel 
                         name="name" 
                         label="Name"  
                         inputType="text" 
-                        placeHolder="Name of the Endpoint" 
+                        placeHolder="Name of the Page" 
                         value={values?.name} 
                         handler={handleInputChange.bind(this)}  />
                 </div>
-                <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
+                <div className="flex justify-center items-center break-all bg-gray-50 w-4/12 text-ellipsis">
                     <SingleInputNoLabel 
                         name="description" 
                         label="Description"  
                         inputType="text" 
-                        placeHolder="What the Call to the  Endpoint Does" 
+                        placeHolder="What the Call to the  Page Does" 
                         value={values?.description} 
                         handler={handleInputChange.bind(this)} />
                 </div>
+                
                 <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
-                    <SingleInputNoLabel 
-                        name="route_path" 
-                        label="Route Path"  
-                        inputType="text" 
-                        placeHolder="Endpoint Address to Call upon" 
-                        value={values?.route_path} 
-                        handler={handleInputChange.bind(this)} />
-                </div>
-                <div className="flex justify-center items-center break-all bg-gray-50 w-2/12 text-ellipsis">
+                    <div className="flex justify-center items-center h-full w-4/12 bg-gray-200">
+                        <CheckBoxInput
+                            value={values.active} 
+                            label=""
+                            name="active"
+                            handler={handleInputChange.bind(this)}
+                            />
+                    </div>
                     <div className="flex justify-center items-center w-4/12 bg-gray-50">
                         <ErrorBoundary>
                             <button onClick={()=>handlePatch()} >
@@ -248,15 +242,15 @@ export function EditableGetEndPointComponent( {item, index} ){
     )
 }
 
-export function EditableGetEndPointComponentMobile( {item, index} ){
+export function EditableGetPageComponentMobile( {item, index} ){
     const [edit,setEdit]=useState(false)
-    const patch = useEndPointStore((state)=>state.patchEndpoint)
-    const deleteEnd = useEndPointStore((state)=>state.deleteEndpoint)
+    const patch = usePageStore((state)=>state.patchPage)
+    const deleteEnd = usePageStore((state)=>state.deletePage)
     const [values, setValues] = useState({
         id: '',
         name: '',
         description : '',
-        route_path: ''
+        active: ''
     });
 
     const editing=()=>{
@@ -266,7 +260,7 @@ export function EditableGetEndPointComponentMobile( {item, index} ){
             id : item?.id,
             name: item?.name,
             description: item?.description,
-            route_path : item.route_path ? item?.route_path : ""
+            active: item?.active
             }));
     
     }
@@ -286,6 +280,7 @@ export function EditableGetEndPointComponentMobile( {item, index} ){
         }));
        
     };
+
     return (
         <Fragment key={'mobile-form-row'+index}>                   
            
@@ -303,8 +298,8 @@ export function EditableGetEndPointComponentMobile( {item, index} ){
                     <div className="flex justify-center text-ellipsis text-nowrap overflow-hidden items-center w-8/12 break-all p-1 bg-gray-300 indent-3">{item?.description}</div>
                 </div>
                 <div className="w-full flex flex-row justify-center">
-                    <div className="flex justify-center items-center w-4/12 p-1  bg-gray-200 ">Path </div>
-                    <div className="flex justify-center items-center w-8/12 p-1 capitalize bg-gray-300 indent-3">{item?.route_path}</div>
+                    <div className="flex justify-center items-center w-4/12 p-1  bg-gray-200 ">Active </div>
+                    <div className= {`flex justify-center items-center w-8/12 p-1 capitalize bg-gray-300 indent-3 ${item?.active ? "text-green-700 font-bold" :"text-red-700 font-bold"}`}>{item?.active.toString()}</div>
                 </div> 
                 
                 <div className={ edit ? "hidden":"w-full space-x-2 flex flex-row h-10 justify-center items-center"} >
@@ -328,7 +323,7 @@ export function EditableGetEndPointComponentMobile( {item, index} ){
                             <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300"> 
                             <ReadOnlySingleInputNoLabel 
                                 name="id" 
-                                label="Endpoint ID"  
+                                label="Page ID"  
                                 inputType="text" 
                                 placeHolder="Admin" 
                                 value={values.id} 
@@ -354,21 +349,20 @@ export function EditableGetEndPointComponentMobile( {item, index} ){
                                 name="description" 
                                 label="Description"  
                                 inputType="text" 
-                                placeHolder="Description of Endpoint Address" 
+                                placeHolder="Description of Page Address" 
                                 value={values?.description} 
                                 handler={handleInputChange.bind(this)} />
                             </div>
                         </div>
                         <div className="w-full flex flex-row  justify-center">
-                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Endpoint(Path)</div>
+                            <div className="flex justify-center items-center w-4/12 p-1 bg-gray-200 ">Active</div>
                             <div className="flex justify-center items-center w-8/12 p-1 bg-gray-300">
-                            <SingleInputNoLabel 
-                                name="route_path" 
-                                label="Route Path"  
-                                inputType="text" 
-                                placeHolder="Description of Endpoint Address" 
-                                value={values?.route_path} 
-                                handler={handleInputChange.bind(this)} />
+                            <CheckBoxInput
+                                value={values.active} 
+                                label=""
+                                name="active"
+                                handler={handleInputChange.bind(this)}
+                                />
                             </div>
                         </div> 
                         <div className="w-full flex flex-row justify-center">
@@ -392,25 +386,25 @@ export function EditableGetEndPointComponentMobile( {item, index} ){
     )
 }
 
-export function EndPointPage(){ 
+export function BluePage(){ 
     const sizeDropDown= Array.from({length : 50},(_,i) => i+1)
-    const get_endpoints = useEndPointStore((state)=>state.getEndPoints)
-    const filter_value = useEndPointStore((state)=>state.filter)
-    const setFiltervalue = useEndPointStore((state)=>state.setFilterValue)
-    const renderData = useEndPointStore((state)=>state.filtered_endpoints)
+    const get_pages = usePageStore((state)=>state.getPages)
+    const filter_value = usePageStore((state)=>state.filter)
+    const setFiltervalue = usePageStore((state)=>state.setFilterValue)
+    const renderData = usePageStore((state)=>state.filtered_pages)
     //  pagination states
 
 
-    const page = useEndPointStore((state)=>state.page)
-    const pages = useEndPointStore((state)=>state.pages)
-    const pageSize = useEndPointStore((state)=>state.size)
-    const setPage = useEndPointStore((state)=>state.setPage)
-    const setPageSize = useEndPointStore((state)=>state.setSize)
+    const page = usePageStore((state)=>state.page_num)
+    const pages = usePageStore((state)=>state.pages)
+    const pageSize = usePageStore((state)=>state.size)
+    const setPage = usePageStore((state)=>state.setPage)
+    const setPageSize = usePageStore((state)=>state.setSize)
     const [sPage, setSpage]= useState(1)
     
 
     useEffect(()=>{
-        get_endpoints()
+        get_pages()
         
     },[])
 
@@ -423,7 +417,7 @@ export function EndPointPage(){
     return (
         <>
 
-        <title>EndPoints</title>
+        <title>Pages</title>
         <ErrorBoundary>
         <div className="w-full  h-72 flex flex-col overflow-y-scroll scrollbar-none md:flex-row items-stretch justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
             <div className=' flex w-full md:w-6/12  h-full items-center justify-center'>
@@ -437,7 +431,7 @@ export function EndPointPage(){
         </ErrorBoundary>
         <ErrorBoundary>
         <div className="bg-zinc-100 h-auto  shadow-lg w-full text-sm">
-                <AddEndpointForm />
+                <AddPageForm />
             </div>
         </ErrorBoundary>
         <ErrorBoundary>
@@ -449,7 +443,7 @@ export function EndPointPage(){
                                 <input value={filter_value}  onChange={handleInputChange} maxLength="50" className="rounded-lg w-9/12 text-black" placeholder="search text here .." name="search" type="search"/>
                             </div>
                             <div className="flex justify-center items-center w-10 h-full rounded bg-slate-700">
-                                <button onClick={get_endpoints}>
+                                <button onClick={get_pages}>
                                     <RefreshIcon />
                                 </button>
                             </div>
@@ -471,17 +465,15 @@ export function EndPointPage(){
                             <div className="flex bg-slate-700 w-1/12 rounded-tl-lg justify-center items-center">
                                 <p>ID</p>
                             </div>
-                            <div className="flex justify-center items-center bg-slate-700 w-3/12">
+                            <div className="flex justify-center items-center bg-slate-700 w-4/12">
                                 <p>Name</p>
                             </div>
-                            <div className="flex justify-center items-center bg-slate-700 w-3/12">
+                            <div className="flex justify-center items-center bg-slate-700 w-4/12">
                             <p>Description</p>
                             </div>
-                            <div className="flex justify-center items-center bg-slate-700 w-3/12">
-                            <p>Path(Endpoint)</p>
-                            </div>
-                            <div className="flex justify-center items-center bg-slate-700 w-2/12 rounded-tr-lg">
-                            <p>Actions</p>
+                            
+                            <div className="flex justify-center items-center bg-slate-700 w-3/12 rounded-tr-lg">
+                            
                             </div>
                     </div>
                               
@@ -490,7 +482,7 @@ export function EndPointPage(){
                         renderData?.map((x,index) =>{
                             return(
                                 <Fragment key={"editable"+index} >
-                                <EditableGetEndPointComponent  item={x} index={index} />
+                                <EditableGetPageComponent  item={x} index={index} />
                                 </Fragment>
                             )
                         })
@@ -504,7 +496,7 @@ export function EndPointPage(){
                             renderData?.map((x,index) =>{       
                                 return (
                                     <Fragment key={'mobile-one'+index}>
-                                        <EditableGetEndPointComponentMobile item={x} index={index} />
+                                        <EditableGetPageComponentMobile item={x} index={index} />
                                     </Fragment>
                                 )    
                                     })
