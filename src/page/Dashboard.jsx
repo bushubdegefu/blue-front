@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { useDashBoardStore } from "../store/dashboard"
 import { useLogInStore } from "../store/login"
+import { Link, Navigate } from "react-router-dom"
 
 export function Dashboard(){
 
@@ -63,8 +64,9 @@ export function Dashboard(){
                         }    
                         { !loggedIn ?
                                 <a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
-                                href="/Login"	 onClick={null}> Login
+                                 	href="/login" onClick={null}> Login
                                 </a> 
+                                // <Link to={"/login"}></Link>
                                 :
                             <a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
                             href="/#"	 onClick={logout}> Logout
