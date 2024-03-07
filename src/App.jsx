@@ -14,7 +14,7 @@ import { RolePage, SingleRolesSection } from './page/Role'
 import { useStyle } from './store/theme'
 import { useLogInStore } from './store/login'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { Dashboard } from './page/Dashboard'
+import { Dashboard, DashboardMobile } from './page/Dashboard'
 import { PrivateRoutes } from './components/privateroute'
 
 
@@ -31,6 +31,9 @@ function App() {
 				<Dashboard />
 			</div>
 		</ErrorBoundary>
+    <ErrorBoundary>
+      <DashboardMobile />
+    </ErrorBoundary>
 
 
         <BrowserRouter>

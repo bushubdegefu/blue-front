@@ -8,6 +8,7 @@ module.exports = {
     require('tailwind-scrollbar')({ nocompatible: true }),
     require('@tailwindcss/typography'),
     require('@tailwindcss/forms'),
+    require("daisyui")
   
   ],
 }
