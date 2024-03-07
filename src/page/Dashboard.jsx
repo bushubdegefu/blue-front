@@ -119,7 +119,7 @@ export function DashboardMobile(){
     }
 
     return (
-        <div className="navbar block md:hidden bg-base-300 rounded-box">
+        <div className="navbar block lg:hidden bg-base-300 rounded-box">
             <div className="flex-1 px-2 lg:flex-none">
             <a className="text-lg font-bold">Blue UMS</a>
             </div> 
