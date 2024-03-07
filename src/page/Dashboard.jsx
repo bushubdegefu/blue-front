@@ -119,48 +119,48 @@ export function DashboardMobile(){
     }
 
     return (
-        <div className="navbar block lg:hidden bg-base-300 rounded-box">
-            <div className="flex-1 px-2 lg:flex-none">
+        <div className="navbar flex flex-row items-stretch lg:hidden bg-base-300 rounded-box">
+            <div className="flex-1 px-2  lg:flex-none">
             <a className="text-lg font-bold">Blue UMS</a>
             </div> 
-            <div className="flex justify-end flex-1 px-2">
+            <div className="flex w-10/12 justify-end flex-1 px-2">
                 <div className="flex items-stretch">
-                    <a href="/home" className="btn btn-ghost rounded-btn">Home</a>
-                    <div className="dropdown dropdown-end">
-                    <div tabIndex={0} role="button" className="btn btn-ghost rounded-btn">Admin Pages</div>
-                            <ul tabIndex={0} className="menu dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-52 mt-4">
-                            {
-                                            app_pages?.BlueAdmin.sort().map((page,index)=>{                     
-                                                if (CheckRoles(page)){
-                                                    return (
+                        <a href="/home" className="btn btn-ghost rounded-btn">Home</a>
+                        <div className="dropdown dropdown-end">
+                        <div tabIndex={0} role="button" className="btn btn-ghost rounded-btn">Admin Pages</div>
+                                <ul tabIndex={0} className="menu dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                                {
+                                                app_pages?.BlueAdmin.sort().map((page,index)=>{                     
+                                                    if (CheckRoles(page)){
+                                                        return (
+                                                        <li>
+                                                            <a key={page+index} className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
+                                                                href={"/"+page.toLowerCase().replace(/\s+/g, '')}	 onClick={null}> {page}
+                                                            </a>
+                                                        </li> 
+                                                        )
+                                                }  
+                                                return ""                               
+                                                })
+                                                    
+                                            }
+                                            { !loggedIn ?
                                                     <li>
-                                                        <a key={page+index} className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
-                                                            href={"/"+page.toLowerCase().replace(/\s+/g, '')}	 onClick={null}> {page}
-                                                        </a>
-                                                    </li> 
-                                                    )
-                                            }  
-                                            return ""                               
-                                            })
-                                                
-                                        }
-                                        { !loggedIn ?
-                                                <li>
-                                                    <a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
-                                                        href="/login" onClick={null}> Login
-                                                    </a> 
-                                                </li>
-                                                // <Link to={"/login"}></Link>
-                                                :
-                                                <li>
-                                                    <a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
-                                                    href="/#"	 onClick={logout}> Logout
-                                                    </a> 
-                                                </li>
-                                        }
-                            </ul>
-                    </div>
-            </div>
+                                                        <a className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
+                                                            href="/login" onClick={null}> Login
+                                                        </a> 
+                                                    </li>
+                                                    // <Link to={"/login"}></Link>
+                                                    :
+                                                    <li>
+                                                        <a className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
+                                                        href="/#"	 onClick={logout}> Logout
+                                                        </a> 
+                                                    </li>
+                                            }
+                                </ul>
+                        </div>
+                </div>
             </div>
         </div>            
     )
