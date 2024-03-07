@@ -24,7 +24,7 @@ export const useUserStore = create(
                 url: `/users?page=${get().page}&size=${get().size}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {               
                 set((state) => ({ 
@@ -51,7 +51,7 @@ export const useUserStore = create(
                    url: `/users/${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   set((state) => ({ 
@@ -75,7 +75,7 @@ export const useUserStore = create(
                    url: `/userrole/${user_id}/${role_id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                     console.log(response)
@@ -96,7 +96,7 @@ export const useUserStore = create(
                    url: `/userrole/${user_id}/${role_id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   get().getSingleUser(user_id)
@@ -154,7 +154,7 @@ export const useUserStore = create(
                    url: `/users/${data?.id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                    data: data
                }).then(function (response) { 
@@ -176,7 +176,7 @@ export const useUserStore = create(
                        url: `/users`,
                        headers: {
                            'Content-Type': 'application/json',
-                           'X-APP-TOKEN' : `Bearer ${token}`
+                           'X-APP-TOKEN' : token
                        },
                        data: data
                    }).then(function (response) {               
@@ -198,7 +198,7 @@ export const useUserStore = create(
                 url: `/users/${id}?status=${status.toString()}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {
                 console.log(response)

@@ -1,16 +1,17 @@
+import 'chart.js/auto';
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon, EditIcon, CancelIcon, UpdateIcon} from "../components/Icons";
-import { SelectInput, SingleInput, CheckBoxInput,ReadOnlySingleInputNoLabel,TextInputNoLabel,SingleInputNoLabel } from "../components/Input"
-
+import {CheckBoxInput, ReadOnlySingleInputNoLabel, SingleInputNoLabel } from "../components/Input"
 import { useEffect, Fragment, useState } from 'react';
 import { useUserStore } from '../store/user';
 import { Pagination } from '../components/Pagination';
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { RolesDropDown } from './Role';
 import { NormalButton, TabNormalButton } from '../components/Button';
 import { useStyle } from '../store/theme';
-import 'chart.js/auto';
 import { Pie ,Bar } from 'react-chartjs-2';
+import useCheckFeatures from '../uitls/check_features';
+import useCheckPage from '../uitls/check_page';
 
 
 // ########################################
@@ -98,6 +99,9 @@ export function EditableGetUserComponentMobile( {item, index} ){
 }
 
 export function UserPage(){ 
+    // check feature and page  roles for render
+    const page_check = useCheckPage("Page")
+    
     const sizeDropDown= Array.from({length : 50},(_,i) => i+1)
     const get_users = useUserStore((state)=>state.getUsers)
     const filter_value = useUserStore((state)=>state.filter)
@@ -125,7 +129,7 @@ export function UserPage(){
         setFiltervalue(target.value)
     };
 
-    return (
+    return (page_check ?
         <>
 
         <title>Users</title>
@@ -214,6 +218,8 @@ export function UserPage(){
             </div>
         </ErrorBoundary>
         </>
+        :
+        <Navigate to="/home" />
     )
 }
 
@@ -266,6 +272,9 @@ function DeleteUserRoleButton({ user_id , role_id}){
 }
 
 export function AddRoleToUserForm( {user_id } ){
+    // feature render check
+    const feature_check = useCheckFeatures("user_write")
+
     const addUserRole = useUserStore((state)=>state.addUserRole)   
     const [roleId, setRoleId] = useState();
     const handleClick =()=>{
@@ -285,7 +294,7 @@ export function AddRoleToUserForm( {user_id } ){
 
     return(
         <Fragment>
-           <div className="flex w-full content-center items-center justify-center h-full ">
+           <div className={`flex w-full content-center items-center justify-center h-full ${feature_check ? "": "hidden" } `}>
                 <div className="flex flex-col items-center justify-center min-w-0 break-words w-full rounded-lg  border-0">                    
                     <div className="w-full  flex-auto px-4 lg:px-10 py-10 pt-0">
                         <form className="p-5 w-full bg-sky-50 rounded-lg ">
@@ -319,8 +328,10 @@ export function AddRoleToUserForm( {user_id } ){
     
 }
 
-
 export function EditableSingleUserComponent( {item} ){
+    //  for component render checks based on features
+    const feature_check = useCheckFeatures("user_write")
+
     const [tabToken,setTabToken]=useState(1)
     const patch = useUserStore((state)=>state.patchUser)
     const [edit,setEdit]=useState(false)
@@ -338,8 +349,8 @@ export function EditableSingleUserComponent( {item} ){
                 email: item?.email,
                 disabled: item?.disabled
             }));
-    
-    }
+        }
+
     const handlePatch =()=>{
         patch(values)
         setEdit(false)
@@ -353,283 +364,223 @@ export function EditableSingleUserComponent( {item} ){
            ...values,
            [target.name] : value,
         }));
-       
     };
     
     if (item != null) {
     return (
-    <Fragment key={'form-row'+item.id}>
-          <div  className={edit ? "hidden":"w-full  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto"}>
-            <div className="flex bg-gray-50 w-1/12 justify-center items-center">
-                <p>{item.id}</p>
-            </div>
-            <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-4/12 overflow-hidden">
-                <p className="p-3 ">{item.uuid}</p>
-            </div>
-            <div className="flex justify-center items-center break-all bg-gray-50 w-4/12 text-ellipsis">
-                <p> {item.email}</p>
-            </div>
-            <div className="flex justify-center capitalize items-center bg-gray-50 w-3/12 ">
-                    <div  className="w-8/12  flex flex-row space-x-1 my-auto items-stretch justify-center h-auto">
-                        <p> {item.disabled.toString()}</p>
-                    </div>
-                    <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
-                        <div className="w-full flex justify-center items-center">
-                            <button onClick={editing}>
-                                <EditIcon />
-                            </button>
-                        </div>
-                    </div>
-            </div>
-        </div>
-        <ErrorBoundary>
-            <div  className={edit ? "w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
+        <Fragment key={'form-row'+item.id}>
+            <div  className={edit ? "hidden":"w-full  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto"}>
                 <div className="flex bg-gray-50 w-1/12 justify-center items-center">
-                    <ReadOnlySingleInputNoLabel 
-                        name="id" 
-                        label="User ID"  
-                        inputType="text" 
-                        placeHolder="Admin" 
-                        value={values.id} 
-                            />
+                    <p>{item.id}</p>
                 </div>
                 <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-4/12 overflow-hidden">
-                    <ReadOnlySingleInputNoLabel 
-                        name="uuid" 
-                        label="UUID"  
-                        inputType="text" 
-                        placeHolder="user identifier" 
-                        value={item?.uuid} 
-                        handler={handleInputChange.bind(this)}  />
+                    <p className="p-3 ">{item.uuid}</p>
                 </div>
                 <div className="flex justify-center items-center break-all bg-gray-50 w-4/12 text-ellipsis">
-                    <SingleInputNoLabel 
-                        name="email" 
-                        label="email"  
-                        inputType="text" 
-                        placeHolder="What you can do with feature" 
-                        value={values?.email} 
-                        handler={handleInputChange.bind(this)} />
+                    <p> {item.email}</p>
                 </div>
-                <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
-                    <div className="flex justify-center items-center h-full w-4/12 bg-gray-100">
-                        <CheckBoxInput
-                            value={values?.disabled} 
-                            label=""
-                            name="disabled"
-                            handler={handleInputChange.bind(this)}
-                            />
+                <div className="flex justify-center capitalize items-center bg-gray-50 w-3/12 ">
+                        <div  className="w-8/12  flex flex-row space-x-1 my-auto items-stretch justify-center h-auto">
+                            <p> {item.disabled.toString()}</p>
+                        </div>
+                        <div  className={`w-5/12 ${feature_check ? "": "hidden" }  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto`}>
+                            <div className="w-full flex justify-center items-center">
+                                <button onClick={editing}>
+                                    <EditIcon />
+                                </button>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <ErrorBoundary>
+                <div  className={edit ? "w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
+                    <div className="flex bg-gray-50 w-1/12 justify-center items-center">
+                        <ReadOnlySingleInputNoLabel 
+                            name="id" 
+                            label="User ID"  
+                            inputType="text" 
+                            placeHolder="Admin" 
+                            value={values.id} 
+                                />
                     </div>
-                    <div className="flex justify-center items-center w-4/12 bg-gray-50">
+                    <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-4/12 overflow-hidden">
+                        <ReadOnlySingleInputNoLabel 
+                            name="uuid" 
+                            label="UUID"  
+                            inputType="text" 
+                            placeHolder="user identifier" 
+                            value={item?.uuid} 
+                            handler={handleInputChange.bind(this)}  />
+                    </div>
+                    <div className="flex justify-center items-center break-all bg-gray-50 w-4/12 text-ellipsis">
+                        <SingleInputNoLabel 
+                            name="email" 
+                            label="email"  
+                            inputType="text" 
+                            placeHolder="What you can do with feature" 
+                            value={values?.email} 
+                            handler={handleInputChange.bind(this)} />
+                    </div>
+                    <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
+                        <div className="flex justify-center items-center h-full w-4/12 bg-gray-100">
+                            <CheckBoxInput
+                                value={values?.disabled} 
+                                label=""
+                                name="disabled"
+                                handler={handleInputChange.bind(this)}
+                                />
+                        </div>
+                        <div className="flex justify-center items-center w-4/12 bg-gray-50">
+                            <ErrorBoundary>
+                                <button onClick={()=>handlePatch()} >
+                                    <UpdateIcon />
+                                </button>
+                            </ErrorBoundary>
+                        </div>
+                        <div className="flex justify-center items-center w-4/12 bg-gray-50">
+                            <button onClick={()=>setEdit(!edit)} >
+                                <CancelIcon />
+                            </button>                            
+                        </div>
+                    </div>
+                </div>        
+            </ErrorBoundary>
+            <br/>
+            <div className="w-full flex items-stretch justify-start h-full ">
+                <div className="w-full tabs">
+                    <div className="tab-list flex flex-row p-1 bg-blue-100 flex-wrap space-x-1">
+                        <div className="tab" onClick={()=>setTabToken(1)}>
+                            <TabNormalButton index={1}  token={tabToken} label="Use Cases" />
+                        </div>
+                        <div className="tab" onClick={()=>setTabToken(2)}>
+                            <TabNormalButton index={2} token={tabToken} label="Roles" />
+                        </div>
+                        <div className={`tab ${feature_check ? "": "hidden" }`} onClick={()=>setTabToken(3)} >
+                            <TabNormalButton index={3} token={tabToken} label="Operations" />
+                        </div>
+                    
+                    </div>
+                    <div className={tabToken == 1 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
+                        <div className="flex w-full content-center items-center justify-center h-full  p-0">
+                        <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
+                            <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
+                                <div className="px-6 py-4">
+                                    <div className="font-bold text-xl mb-2">Adding Roles To System User</div>
+                                    <p className="text-gray-700 text-base">
+                                    The Added Roles to Users refers to attaching privlege to a user to provided access to endpoints 
+                                    that require the specified roles
+                                    </p>
+                                </div>
+                                <div className="px-6 pt-4 pb-2">
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#adduserrole</span>
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
+                                </div>
+                            </div>
+                            <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">        
+                                <div className="px-6 py-4">
+                                    <div className="font-bold text-xl mb-2">Resetting User Password </div>
+                                    <p className="text-gray-700 text-base">
+                                    Resets Password to "default@123" and forces user to Change password when logging in.
+
+                                    </p>
+                                </div>
+                                <div className="px-6 pt-4 pb-2">
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                                </div>
+                            </div>
+                            <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg"> 
+                                <div className="px-6 py-4">
+                                    <div className="font-bold text-xl mb-2">Disable User </div>
+                                    <p className="text-gray-700 text-base">
+                                    If user Disabled value is "True"; it means user will not be allowed to login.
+                                    
+                                    </p>
+                                </div>
+                                <div className="px-6 pt-4 pb-2">
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                                </div>
+                            </div> 
+                            <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                                <div className="px-6 py-4">
+                                    <div className="font-bold text-xl mb-2">Remove Pages From Users </div>
+                                    <p className="text-gray-700 text-base">
+                                    Revokes access to the specified page to User if removed.
+                                    </p>
+                                </div>
+                                <div className="px-6 pt-4 pb-2">
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
+                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                                </div>
+                            </div>  
+                        </div>
+                        </div>
+                    </div>
+                    <div className={tabToken == 2 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
                         <ErrorBoundary>
-                            <button onClick={()=>handlePatch()} >
-                                <UpdateIcon />
-                            </button>
+                        <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
+                                <div></div>
+                                {
+                                
+                                                                        
+                                item.roles?.map((role,index)=>{
+                                    return (
+                                        <div key={index+role.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                            <div className="w-10/12 text-sm text-nowrap text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
+                                                <p>{role.name}</p>
+                                            </div>
+                                            <div className={`w-2/12 flex items-center justify-center bg-slate-300 ${feature_check ? "": "hidden" }`}>
+                                                <ErrorBoundary>
+                                                    <DeleteUserRoleButton role_id={role.id} user_id={item.id} />
+                                                </ErrorBoundary>
+                                            </div>
+                                        </div>
+                                        )
+                                    })   
+                                    
+                                
+                                } 
+                        </div>
+                            <br/>
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                                <AddRoleToUserForm user_id={item.id} />
                         </ErrorBoundary>
                     </div>
-                    <div className="flex justify-center items-center w-4/12 bg-gray-50">
-                        <button onClick={()=>setEdit(!edit)} >
-                            <CancelIcon />
-                        </button>                            
-                    </div>
-                </div>
-            </div>        
-        </ErrorBoundary>
-        <br/>
-        <div className="w-full flex items-stretch justify-start h-full ">
-            <div className="w-full tabs">
-                <div className="tab-list flex flex-row p-1 bg-blue-100 flex-wrap space-x-1">
-                    <div className="tab" onClick={()=>setTabToken(1)}>
-                        <TabNormalButton index={1}  token={tabToken} label="Use Cases" />
-                    </div>
-                    <div className="tab" onClick={()=>setTabToken(2)}>
-                        <TabNormalButton index={2} token={tabToken} label="Roles" />
-                    </div>
-                    <div className="tab" onClick={()=>setTabToken(3)} >
-                        <TabNormalButton index={3} token={tabToken} label="Operations" />
-                    </div>
-                 
-                </div>
-                <div className={tabToken == 1 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                    <div className="flex w-full content-center items-center justify-center h-full  p-0">
-                    <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
-                        <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
-                            <div className="px-6 py-4">
-                                <div className="font-bold text-xl mb-2">Adding Roles To System User</div>
-                                <p className="text-gray-700 text-base">
-                                The Added Roles to Users refers to attaching privlege to a user to provided access to endpoints 
-                                that require the specified roles
-                                </p>
-                            </div>
-                            <div className="px-6 pt-4 pb-2">
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#adduserrole</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
-                            </div>
-                        </div>
-                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                        
-                            <div className="px-6 py-4">
-                                <div className="font-bold text-xl mb-2">Resetting User Password </div>
-                                <p className="text-gray-700 text-base">
-                                Resets Password to "default@123" and forces user to Change password when logging in.
-
-                                </p>
-                            </div>
-                            <div className="px-6 pt-4 pb-2">
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
-                            </div>
-                        </div>
-                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                        
-                            <div className="px-6 py-4">
-                                <div className="font-bold text-xl mb-2">Disable User </div>
-                                <p className="text-gray-700 text-base">
-                                If user Disabled value is "True"; it means user will not be allowed to login.
-                                
-                                </p>
-                            </div>
-                            <div className="px-6 pt-4 pb-2">
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
-                            </div>
-                        </div> 
-                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                            <div className="px-6 py-4">
-                                <div className="font-bold text-xl mb-2">Add Pages To Users </div>
-                                <p className="text-gray-700 text-base">
-                                As long as the attached Page is active;User will have Access to Operations.
-                                In addtion the specified page will not be added to 
-                                the user if User does not have at least one role that is required by the Page
-                                for access.
-                                </p>
-                            </div>
-                            <div className="px-6 pt-4 pb-2">
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
-                            </div>
-                        </div>
-                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                            <div className="px-6 py-4">
-                                <div className="font-bold text-xl mb-2">Remove Pages From Users </div>
-                                <p className="text-gray-700 text-base">
-                                Revokes access to the specified page to User if removed.
-                                </p>
-                            </div>
-                            <div className="px-6 pt-4 pb-2">
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
-                            </div>
-                        </div>  
-                    </div>
-                    </div>
-                
-                </div>
-                <div className={tabToken == 2 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                    <ErrorBoundary>
-                    <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
-                            <div></div>
-                            {
+                    <div className={tabToken == 3 ? "tab-panel w-full flex flex-row flex-wrap items-stretch justify-start pt-5 pb-8" : "hidden"} >
+                        <div className="flex w-4/12 flex-col items-center justify-center h-full ">
+                            <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
                             
-                                                                      
-                             item.roles?.map((role,index)=>{
-                                return (
-                                    <div key={index+role.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                        <div className="w-10/12 text-sm text-nowrap text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
-                                            <p>{role.name}</p>
-                                        </div>
-                                        <div className="w-2/12 flex items-center justify-center bg-slate-300">
-                                            <ErrorBoundary>
-                                                <DeleteUserRoleButton role_id={role.id} user_id={item.id} />
-                                            </ErrorBoundary>
-                                        </div>
-                                    </div>
-                                    )
-                                })   
-                                
+                                <ErrorBoundary>
+                                    { item.disabled ?
+                                    <ActivateUserButton  user_id={item.id}/>:
+                                    <DeactivateUserButton user_id={item.id} />
+
+                                    }
+                                </ErrorBoundary>
+                            </div>
                             
-                            } 
-                    </div>
-                        <br/>
-                    </ErrorBoundary>
-                    <ErrorBoundary>
-                    <AddRoleToUserForm user_id={item.id} />
-                    </ErrorBoundary>
-                </div>
-                <div className={tabToken == 3 ? "tab-panel w-full flex flex-row flex-wrap items-stretch justify-start pt-5 pb-8" : "hidden"} >
+                        </div>                   
+                    </div>    
                     
-                    <div className="flex w-4/12 flex-col items-center justify-center h-full ">
-                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                        
-                            <ErrorBoundary>
-                                { item.disabled ?
-                                <ActivateUserButton  user_id={item.id}/>:
-                                <DeactivateUserButton user_id={item.id} />
-
-                                }
-                            </ErrorBoundary>
-                        </div>
-                        
-                    </div> 
-                    <div className="flex w-4/12 flex-col items-center justify-center h-full ">
-                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                        
-                            <ErrorBoundary>
-                                { item.disabled ?
-                                <ActivateUserButton  user_id={item.id}/>:
-                                <DeactivateUserButton user_id={item.id} />
-
-                                }
-                            </ErrorBoundary>
-                        </div>
-                        
-                    </div>
-                    <div className="flex w-4/12 flex-col items-center justify-center h-full ">
-                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                        
-                            <ErrorBoundary>
-                                { item.disabled ?
-                                <ActivateUserButton  user_id={item.id}/>:
-                                <DeactivateUserButton user_id={item.id} />
-
-                                }
-                            </ErrorBoundary>
-                        </div>
-                        
-                    </div>
-                    <div className="flex w-4/12 flex-col items-center justify-center h-full ">
-                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                        
-                            <ErrorBoundary>
-                                { item.disabled ?
-                                <ActivateUserButton  user_id={item.id}/>:
-                                <DeactivateUserButton user_id={item.id} />
-
-                                }
-                            </ErrorBoundary>
-                        </div>
-                        
-                    </div>
-
-                    
-                               
-                </div>    
-                
-            </div> 
-        </div>
-        
-    </Fragment>
-    )
+                </div> 
+            </div>
+            
+        </Fragment>
+        )
     }
     return ""
 }
 
 export function EditableSingleUserComponentMobile({item}){
+    // feature render check with roles
+    const feature_check = useCheckFeatures("user_write")
+
     const [tabToken,setTabToken]=useState(1) 
     const [view,setView]=useState(false)
     const patch = useUserStore((state)=>state.patchUser)
@@ -755,7 +706,7 @@ export function EditableSingleUserComponentMobile({item}){
                         </div>                             
                 </div>
                 {/* ### */}
-                <div className={ edit ? "hidden":"w-full flex flex-row h-10 justify-center"} >
+                <div className={ edit ? "hidden":`w-full flex flex-row h-10 justify-center ${feature_check ? "": "hidden" } `} >
                         <button onClick={editing} >
                             <EditIcon />
                         </button> 
@@ -775,7 +726,7 @@ export function EditableSingleUserComponentMobile({item}){
                     <div className="tab" onClick={()=>setTabToken(2)}>
                         <TabNormalButton index={2} token={tabToken} label="Roles" />
                     </div>
-                    <div className="tab" onClick={()=>setTabToken(3)} >
+                    <div className={`tab ${feature_check ? "": "hidden" } `} onClick={()=>setTabToken(3)} >
                         <TabNormalButton index={3} token={tabToken} label="Operations" />
                     </div>
                  
@@ -813,12 +764,10 @@ export function EditableSingleUserComponentMobile({item}){
                             </div>
                         </div>
                         <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                        
                             <div className="px-6 py-4">
                                 <div className="font-bold text-xl mb-2">Disable User </div>
                                 <p className="text-gray-700 text-base">
                                 If user Disabled value is "True"; it means user will not be allowed to login.
-                                
                                 </p>
                             </div>
                             <div className="px-6 pt-4 pb-2">
@@ -841,7 +790,7 @@ export function EditableSingleUserComponentMobile({item}){
                                         <div className="w-9/12 bg-slate-400 break-all p-1 flex items-center justify-center">
                                             <p>{role.name}</p>
                                         </div>
-                                        <div className="w-3/12 flex items-center justify-center bg-slate-300">
+                                        <div className={`w-3/12 ${feature_check ? "": "hidden" } flex items-center justify-center bg-slate-300`}>
                                             <ErrorBoundary>
                                                 <DeleteUserRoleButton role_id={role.id} user_id={item.id} />
                                             </ErrorBoundary>
@@ -857,8 +806,7 @@ export function EditableSingleUserComponentMobile({item}){
                     <AddRoleToUserForm user_id={item.id} />
                     </ErrorBoundary>
                 </div>
-                <div className={tabToken == 3 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-               
+                <div className={tabToken == 3 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >           
                     <div className="flex w-10/12 flex-col items-center justify-center h-full ">
                         <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
                         
@@ -882,7 +830,6 @@ export function EditableSingleUserComponentMobile({item}){
 }
 return ""
 }
-
 
 export function SingleUsersSection( ){
     const myContainer=useStyle((state)=>state.styles.componentWorkingDiv)  

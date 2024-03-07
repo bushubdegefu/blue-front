@@ -9,6 +9,7 @@ import { useLogInStore } from './login'
 export const useRoleStore = create(
    
         (set,get) => ({
+        app : null,
         role : null,
         roles : [],
         endpoints: [],
@@ -26,7 +27,7 @@ export const useRoleStore = create(
                 url: `/roles?page=${get().page}&size=${get().size}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {               
                 set((state) => ({ 
@@ -54,7 +55,7 @@ export const useRoleStore = create(
                    url: `/droproles`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {               
                    set((state) => ({ 
@@ -80,7 +81,7 @@ export const useRoleStore = create(
                    url: `/roles/${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   set((state) => ({ 
@@ -96,6 +97,8 @@ export const useRoleStore = create(
                          })
                       
                    });
+                //    console.log(get().role)
+                   get().getSingleApp(get().role.app_id)
            },
         getRoleEndpoints: async (id) => {
             let token = useLogInStore.getState().access_token;
@@ -104,7 +107,7 @@ export const useRoleStore = create(
                    url: `/role_endpoints?role_id=${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   set((state) => ({ 
@@ -164,7 +167,7 @@ export const useRoleStore = create(
                    url: `/roles/${data?.id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                    data: data
                }).then(function (response) {               
@@ -185,7 +188,7 @@ export const useRoleStore = create(
                        url: `/roles`,
                        headers: {
                            'Content-Type': 'application/json',
-                           'X-APP-TOKEN' : `Bearer ${token}`
+                           'X-APP-TOKEN' : token
                        },
                        data: data
                    }).then(function (response) {               
@@ -207,7 +210,7 @@ export const useRoleStore = create(
                 url: `/roles/${id}?active=${status.toString()}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {
                 
@@ -220,7 +223,53 @@ export const useRoleStore = create(
                       })
                    
                 });
-        }
+        },
+        addAppToRole: async (app_id,role_id) => {
+            let token = useLogInStore.getState().access_token;
+          
+            await   blueClient.request({
+                   method: 'PATCH',
+                   url: `/approle/${role_id}?app_id=${app_id}`,
+                   headers: {
+                       'Content-Type': 'application/json',
+                       'X-APP-TOKEN' : token
+                   },
+               }).then(function (response) {
+                  get().getSingleRole(role_id)
+                                    
+                   }).catch((response,error)=> {
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                       toast.error(responseError,{
+                           position: 'top-right'
+                         })
+                      
+                   });
+           },
+        getSingleApp: async (id) => {
+            let token = useLogInStore.getState().access_token;
+            
+            await   blueClient.request({
+                   method: 'GET',
+                   url: `/apps/${id}`,
+                   headers: {
+                       'Content-Type': 'application/json',
+                       'X-APP-TOKEN' : token
+                   },
+               }).then(function (response) {
+                  set((state) => ({ 
+                       ...state,
+                       app: response?.data?.data,
+                       
+                   }))
+                    
+                   }).catch((response,error)=> {
+                       const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                       toast.error(responseError,{
+                           position: 'top-right'
+                         })
+                      
+                   });
+           },
 
         }),
         

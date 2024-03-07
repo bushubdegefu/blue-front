@@ -26,7 +26,7 @@ export const usePageStore = create(
                 url: `/pages?page=${get().page_num}&size=${get().size}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {               
                 set((state) => ({ 
@@ -54,7 +54,7 @@ export const usePageStore = create(
                    url: `/pagedrop`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) { 
 
@@ -81,7 +81,7 @@ export const usePageStore = create(
                    url: `/pages/${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   set((state) => ({ 
@@ -100,17 +100,15 @@ export const usePageStore = create(
            },
         addPageRole: async (page_id,id) => {
             let token = useLogInStore.getState().access_token;
-            let update_role= useRoleStore.getState().getSingleRole
             await   blueClient.request({
-                   method: 'PATCH',
-                   url: `/pagesroles/${page_id}?role_id=${id}`,
+                   method: 'POST',
+                   url: `/pagerole/${page_id}/${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
-                  get().getSinglePage(page_id)
-                  update_role(id)
+                get().getPages()
                     
                    }).catch((response,error)=> {
                        const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
@@ -122,17 +120,16 @@ export const usePageStore = create(
            },
         deletePageRole: async (page_id,id) => {
             let token = useLogInStore.getState().access_token;
-            let update_role =useRoleStore.getState().getSingleRole
             await   blueClient.request({
                    method: 'DELETE',
-                   url: `/pagesroles/${page_id}?role_id=${id}`,
+                   url: `/pagerole/${page_id}/${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
-                  get().getSinglePage(page_id)
-                  update_role(id)  
+                  get().getPages()
+     
                    }).catch((response,error)=> {
                        const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
                        toast.error(responseError,{
@@ -185,7 +182,7 @@ export const usePageStore = create(
                    url: `/pages/${data?.id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                    data: data
                }).then(function (response) {           
@@ -207,7 +204,7 @@ export const usePageStore = create(
                        url: `/pages`,
                        headers: {
                            'Content-Type': 'application/json',
-                           'X-APP-TOKEN' : `Bearer ${token}`
+                           'X-APP-TOKEN' : token
                        },
                        data: data
                    }).then(function (response) {               
@@ -228,7 +225,7 @@ export const usePageStore = create(
                            url: `/pages/${id}`,
                            headers: {
                                'Content-Type': 'application/json',
-                               'X-APP-TOKEN' : `Bearer ${token}`
+                               'X-APP-TOKEN' : token
                            },
                        }).then(function (response) {           
                             get().getPages()
@@ -248,7 +245,7 @@ export const usePageStore = create(
                 url: `/pages/${id}?active=${status.toString()}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {
                 console.log(response)

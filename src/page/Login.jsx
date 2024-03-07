@@ -7,10 +7,8 @@ import { useLogInStore } from "../store/login"
 
 export function LogInPage(){
     const login = useLogInStore((state)=>state.setToken)
-    const currentToken = useLogInStore((state)=>state.access_token)
-    const response_error = useLogInStore((state)=>state.responseError)
-    // const notify = () => toast(`${response_error}`);
-
+    const logged_in_state = useLogInStore((state)=>state.blue_admin_token)
+    
     const [show,setShow]=useState(false)
     const [values, setValues] = useState({
         grant_type: "authorization_code",
@@ -18,14 +16,10 @@ export function LogInPage(){
         password: '',
         token: "none"
     });
-   
-    
+       
     async function handleClick(){
-    
-    login(values)
-
+       login(values)
     }
-    
     
     function handleShow(){
         setShow(!show)
@@ -38,11 +32,13 @@ export function LogInPage(){
         setValues((values) => ({
            ...values,
            [target.name] : value,
-        }));
-       
+        }));       
     };
-
+    
     return(
+        logged_in_state ?
+        <Navigate to='/home'/> 
+            :
         <div className="items-start justify-center w-11/12 h-auto p-2 m-2">          
             <title>Login</title>
             <div className="flex w-full content-center items-center justify-center h-full">
@@ -107,6 +103,4 @@ export function LogInPage(){
        
         </div>
     )
-    
-
 }

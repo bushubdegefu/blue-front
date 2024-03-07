@@ -26,7 +26,7 @@ export const useFeatureStore = create(
                 url: `/features?page=${get().page}&size=${get().size}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {               
                 set((state) => ({ 
@@ -54,7 +54,7 @@ export const useFeatureStore = create(
                    url: `/featuredrop`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) { 
 
@@ -81,7 +81,7 @@ export const useFeatureStore = create(
                    url: `/features/${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   set((state) => ({ 
@@ -106,7 +106,7 @@ export const useFeatureStore = create(
                    url: `/featuresrole/${feature_id}?role_id=${role_id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   get().getSingleFeature(feature_id)
@@ -128,7 +128,7 @@ export const useFeatureStore = create(
                    url: `/featuresrole/${feature_id}?role_id=${role_id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   get().getSingleFeature(feature_id)
@@ -185,7 +185,7 @@ export const useFeatureStore = create(
                    url: `/features/${data?.id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                    data: data
                }).then(function (response) {           
@@ -206,7 +206,7 @@ export const useFeatureStore = create(
                        url: `/features`,
                        headers: {
                            'Content-Type': 'application/json',
-                           'X-APP-TOKEN' : `Bearer ${token}`
+                           'X-APP-TOKEN' : token
                        },
                        data: data
                    }).then(function (response) {               
@@ -228,10 +228,10 @@ export const useFeatureStore = create(
                 url: `/features/${id}?active=${status.toString()}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {
-                console.log(response)
+                
                 get().getFeatures()
                 get().getSingleFeature(id)
                 }).catch((response,error)=> {

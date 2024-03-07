@@ -1,8 +1,6 @@
 
 import { blueClient } from './client'
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
-
 import toast from 'react-hot-toast'
 import { useLogInStore } from './login'
 import { useFeatureStore } from './feature'
@@ -27,7 +25,7 @@ export const useAppStore = create(
                 url: `/apps?page=${get().page}&size=${get().size}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {               
                 set((state) => ({ 
@@ -52,10 +50,10 @@ export const useAppStore = create(
 
             await   blueClient.request({
                    method: 'GET',
-                   url: `/appdrop`,
+                   url: `/appsdrop`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) { 
 
@@ -82,7 +80,7 @@ export const useAppStore = create(
                    url: `/apps/${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   set((state) => ({ 
@@ -107,7 +105,7 @@ export const useAppStore = create(
                    url: `/appsmatrix/${app_id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   
@@ -167,7 +165,7 @@ export const useAppStore = create(
                    url: `/apps/${data?.id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                    data: data
                }).then(function (response) {           
@@ -188,7 +186,7 @@ export const useAppStore = create(
                        url: `/apps`,
                        headers: {
                            'Content-Type': 'application/json',
-                           'X-APP-TOKEN' : `Bearer ${token}`
+                           'X-APP-TOKEN' : token
                        },
                        data: data
                    }).then(function (response) {               
@@ -210,7 +208,7 @@ export const useAppStore = create(
                            url: `/apps/${id}`,
                            headers: {
                                'Content-Type': 'application/json',
-                               'X-APP-TOKEN' : `Bearer ${token}`
+                               'X-APP-TOKEN' : token
                            },
                        }).then(function (response) {           
                             get().getApps()
@@ -230,7 +228,7 @@ export const useAppStore = create(
                 url: `/apps/${id}?active=${status.toString()}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {
                 console.log(response)
@@ -243,8 +241,8 @@ export const useAppStore = create(
                       })
                    
                 });
-        }
-
+        },
+        
         }),
         
 )

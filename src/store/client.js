@@ -1,5 +1,5 @@
 import axios from "axios"
 // const axios = require('axios').default;
-
-export const blueClient = axios.create({ baseURL: 'http://localhost:5500/api/v1',
+// 10.22.129.62
+export const blueClient = axios.create({ baseURL: 'https://goblue-back.onrender.com/api/v1',
                                         timeout: 10000,})

@@ -1,22 +1,20 @@
 import 'chart.js/auto';
 import { data } from "../page/User"
 import { ErrorBoundary } from '../components/ErrorBoundary'
-import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon, EditIcon, UpdateIcon, CancelIcon} from "../components/Icons";
+import { RefreshIcon, TrashIcon, EditIcon, UpdateIcon, CancelIcon} from "../components/Icons";
 import { useEffect, Fragment, useState } from 'react';
 import { useEndPointStore } from '../store/endpoint';
 import { Pagination } from '../components/Pagination';
-import { useParams } from "react-router-dom";
-import { RolesDropDown } from './Role';
-import { NormalButton, TabNormalButton } from '../components/Button';
-import { useStyle } from '../store/theme';
+import { NormalButton } from '../components/Button';
 import { Pie ,Bar } from 'react-chartjs-2';
 import { SelectInput, SingleInput,ReadOnlySingleInputNoLabel,SingleInputNoLabel } from "../components/Input"
+import useCheckPage from '../uitls/check_page';
+import useCheckFeatures from '../uitls/check_features';
 
 export function EndPointsDropDown({ label, value  ,name, handler}){
     const items = useEndPointStore((state)=>state.drop_endpoints)
     const getItems = useEndPointStore((state)=>state.getDropEndPoints)   
-    
-  
+     
     useEffect(()=>{
         getItems()
     },[])
@@ -32,7 +30,6 @@ export function EndPointsDropDown({ label, value  ,name, handler}){
         }
     return ""
 }
-
 
 export function AddEndpointForm(){
     const post = useEndPointStore((state)=>state.postEndpoint)
@@ -63,7 +60,6 @@ export function AddEndpointForm(){
         }));
        
     };
-
 
     return(
         <Fragment>
@@ -119,6 +115,7 @@ export function EditableGetEndPointComponent( {item, index} ){
     const [edit,setEdit]=useState(false)
     const patch = useEndPointStore((state)=>state.patchEndpoint)
     const deleteEnd = useEndPointStore((state)=>state.deleteEndpoint)
+    const feature_check = useCheckFeatures("features_write")
     const [values, setValues] = useState({
         id: '',
         name: '',
@@ -135,10 +132,10 @@ export function EditableGetEndPointComponent( {item, index} ){
             description: item?.description,
             route_path : item.route_path ? item?.route_path : ""
             }));
-    
+
     }
-    const handlePatch =()=>{
-        
+
+    const handlePatch =()=>{  
         patch(values)
         setEdit(false)
     }
@@ -155,96 +152,96 @@ export function EditableGetEndPointComponent( {item, index} ){
     };
 
     return (
-    <Fragment key={'form-row'+index}>
+        <Fragment key={'form-row'+index}>
 
-        <div  className={edit ? "hidden" :"w-full  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto"}>
-            <div className="flex bg-gray-50 w-1/12 rounded-tl-lg justify-center items-center">
-                <p>{item?.id}</p>
-            </div>
-            <div className="flex justify-center text-ellipsis text-nowrap items-center break-all bg-gray-50 w-3/12">
-                <p className="p-3  text-ellipsis ">{item?.name}</p>
-            </div>
-            <div className="flex justify-center items-center break-all text-nowrap bg-gray-50 w-3/12 text-ellipsis">
-                <p> {item?.description}</p>
-            </div>
-            <div className="flex justify-center items-center break-all text-nowrap bg-gray-50 w-3/12 text-ellipsis o">
-                <p> {item?.route_path}</p>
-            </div>
-            <div className="flex capitalize justify-stretch items-stretch bg-gray-50 w-2/12 ">
-                <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
-                    <div className="w-full flex justify-center items-center">
-                        <button onClick={editing}>
-                            <EditIcon />
-                        </button>
-                    </div>
+            <div  className={edit ? "hidden" :"w-full  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto"}>
+                <div className="flex bg-gray-50 w-1/12 rounded-tl-lg justify-center items-center">
+                    <p>{item?.id}</p>
                 </div>
-                <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
-                    <div className="w-full flex justify-center items-center">
-                        <button onClick={()=>deleteEnd(item?.id)}>
-                            <TrashIcon />
-                        </button>
-                    </div>
+                <div className="flex justify-center text-ellipsis text-nowrap items-center break-all bg-gray-50 w-3/12">
+                    <p className="p-3  text-ellipsis ">{item?.name}</p>
                 </div>
-            </div>
-        </div> 
-
-        <ErrorBoundary>
-            <div  className={edit ? "w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
-                <div className="flex bg-gray-50 w-1/12 justify-center items-center">
-                    <ReadOnlySingleInputNoLabel 
-                        name="id" 
-                        label="Endpoint ID"  
-                        inputType="text" 
-                        placeHolder="Admin" 
-                        value={values.id} 
-                            />
+                <div className="flex justify-center items-center break-all text-nowrap bg-gray-50 w-3/12 text-ellipsis">
+                    <p> {item?.description}</p>
                 </div>
-                <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-3/12 overflow-hidden">
-                    <SingleInputNoLabel 
-                        name="name" 
-                        label="Name"  
-                        inputType="text" 
-                        placeHolder="Name of the Endpoint" 
-                        value={values?.name} 
-                        handler={handleInputChange.bind(this)}  />
+                <div className="flex justify-center items-center break-all text-nowrap bg-gray-50 w-3/12 text-ellipsis o">
+                    <p> {item?.route_path}</p>
                 </div>
-                <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
-                    <SingleInputNoLabel 
-                        name="description" 
-                        label="Description"  
-                        inputType="text" 
-                        placeHolder="What the Call to the  Endpoint Does" 
-                        value={values?.description} 
-                        handler={handleInputChange.bind(this)} />
-                </div>
-                <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
-                    <SingleInputNoLabel 
-                        name="route_path" 
-                        label="Route Path"  
-                        inputType="text" 
-                        placeHolder="Endpoint Address to Call upon" 
-                        value={values?.route_path} 
-                        handler={handleInputChange.bind(this)} />
-                </div>
-                <div className="flex justify-center items-center break-all bg-gray-50 w-2/12 text-ellipsis">
-                    <div className="flex justify-center items-center w-4/12 bg-gray-50">
-                        <ErrorBoundary>
-                            <button onClick={()=>handlePatch()} >
-                                <UpdateIcon />
+                <div className={`flex capitalize justify-stretch items-stretch bg-gray-50 w-2/12`}>
+                    <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
+                        <div className={`w-full ${feature_check ? "": "hidden" }  flex justify-center items-center`}>
+                            <button onClick={editing}>
+                                <EditIcon />
                             </button>
-                        </ErrorBoundary>
+                        </div>
                     </div>
-                    <div className="flex justify-center items-center w-4/12 bg-gray-50">
-                        <button onClick={()=>setEdit(!edit)} >
-                            <CancelIcon />
-                        </button>                            
+                    <div  className="w-5/12  text-lg flex flex-row space-x-1 items-stretch my-auto justify-center h-auto">
+                        <div className={`w-full flex justify-center items-center ${feature_check ? "": "hidden" }` }>
+                            <button onClick={()=>deleteEnd(item?.id)}>
+                                <TrashIcon />
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>        
-        </ErrorBoundary>
-       
-         
-    </Fragment>
+            </div> 
+
+            <ErrorBoundary>
+                <div  className={edit ? "w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
+                    <div className="flex bg-gray-50 w-1/12 justify-center items-center">
+                        <ReadOnlySingleInputNoLabel 
+                            name="id" 
+                            label="Endpoint ID"  
+                            inputType="text" 
+                            placeHolder="Admin" 
+                            value={values.id} 
+                                />
+                    </div>
+                    <div className="flex justify-center items-center text-ellipsis text-nowrap break-all bg-gray-50 w-3/12 overflow-hidden">
+                        <SingleInputNoLabel 
+                            name="name" 
+                            label="Name"  
+                            inputType="text" 
+                            placeHolder="Name of the Endpoint" 
+                            value={values?.name} 
+                            handler={handleInputChange.bind(this)}  />
+                    </div>
+                    <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
+                        <SingleInputNoLabel 
+                            name="description" 
+                            label="Description"  
+                            inputType="text" 
+                            placeHolder="What the Call to the  Endpoint Does" 
+                            value={values?.description} 
+                            handler={handleInputChange.bind(this)} />
+                    </div>
+                    <div className="flex justify-center items-center break-all bg-gray-50 w-3/12 text-ellipsis">
+                        <SingleInputNoLabel 
+                            name="route_path" 
+                            label="Route Path"  
+                            inputType="text" 
+                            placeHolder="Endpoint Address to Call upon" 
+                            value={values?.route_path} 
+                            handler={handleInputChange.bind(this)} />
+                    </div>
+                    <div className="flex justify-center items-center break-all bg-gray-50 w-2/12 text-ellipsis">
+                        <div className="flex justify-center items-center w-4/12 bg-gray-50">
+                            <ErrorBoundary>
+                                <button onClick={()=>handlePatch()} >
+                                    <UpdateIcon />
+                                </button>
+                            </ErrorBoundary>
+                        </div>
+                        <div className="flex justify-center items-center w-4/12 bg-gray-50">
+                            <button onClick={()=>setEdit(!edit)} >
+                                <CancelIcon />
+                            </button>                            
+                        </div>
+                    </div>
+                </div>        
+            </ErrorBoundary>
+        
+            
+        </Fragment>
     )
 }
 
@@ -252,6 +249,7 @@ export function EditableGetEndPointComponentMobile( {item, index} ){
     const [edit,setEdit]=useState(false)
     const patch = useEndPointStore((state)=>state.patchEndpoint)
     const deleteEnd = useEndPointStore((state)=>state.deleteEndpoint)
+    const feature_check = useCheckFeatures("features_write")
     const [values, setValues] = useState({
         id: '',
         name: '',
@@ -288,7 +286,6 @@ export function EditableGetEndPointComponentMobile( {item, index} ){
     };
     return (
         <Fragment key={'mobile-form-row'+index}>                   
-           
             <div key={index+'-mobile'} className={edit ? "hidden":"w-full bg-slate-50 text-sm shadow-xl rounded-xl p-2 flex space-y-1 flex-col items-stretch justify-center"} >
                 <div className="w-full flex flex-row justify-center">
                     <div className="flex justify-center items-center w-4/12 bg-gray-200 p-1">ID </div>
@@ -307,7 +304,7 @@ export function EditableGetEndPointComponentMobile( {item, index} ){
                     <div className="flex justify-center items-center w-8/12 p-1 capitalize bg-gray-300 indent-3">{item?.route_path}</div>
                 </div> 
                 
-                <div className={ edit ? "hidden":"w-full space-x-2 flex flex-row h-10 justify-center items-center"} >
+                <div className={ edit ? "hidden":`w-full space-x-2 flex flex-row h-10 justify-center ${feature_check ? "": "hidden" } items-center`} >
                         <div className='flex w-5/12 h-full rounded-2xl justify-center items-center bg-slate-200'>
                             <button  onClick={editing} >
                                 <EditIcon />
@@ -400,6 +397,8 @@ export function EndPointPage(){
     const renderData = useEndPointStore((state)=>state.filtered_endpoints)
     //  pagination states
 
+    const page_check = useCheckPage("Endpoint")
+    const feature_check = useCheckFeatures("features_write")
 
     const page = useEndPointStore((state)=>state.page)
     const pages = useEndPointStore((state)=>state.pages)
@@ -420,7 +419,7 @@ export function EndPointPage(){
         setFiltervalue(target.value)
     };
 
-    return (
+    return ( page_check ?
         <>
 
         <title>EndPoints</title>
@@ -436,12 +435,12 @@ export function EndPointPage(){
         </div>
         </ErrorBoundary>
         <ErrorBoundary>
-        <div className="bg-zinc-100 h-auto  shadow-lg w-full text-sm">
+        <div className={ `${feature_check ? "": "hidden" } bg-zinc-100 h-auto  shadow-lg w-full text-sm py-2`}>
                 <AddEndpointForm />
             </div>
         </ErrorBoundary>
         <ErrorBoundary>
-        <div className="w-full flex items-stretch  justify-start h-full">
+        <div className="w-full flex shadow-xl border-t-2 rounded-xl border-gray-700 items-stretch  justify-start h-full">
                 <div className="flex flex-col space-y-0  items-center justify-start min-w-0 break-words w-full shadow-lg rounded-lg bg-gray-100 border-0 pt-2">
                     <div className="search bar w-full  text-white text-lg flex flex-row space-x-1 items-stretch justify-center h-auto px-4 lg:px-8 py-8 pt-0 pb-1">
                         <div className="w-full h-full flex flex-row items-stretch justify-end">
@@ -517,5 +516,7 @@ export function EndPointPage(){
             </div>
         </ErrorBoundary>
         </>
+        :
+        ""
     )
 }

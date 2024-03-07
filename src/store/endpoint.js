@@ -26,7 +26,7 @@ export const useEndPointStore = create(
                 url: `/endpoints?page=${get().page}&size=${get().size}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {               
                 set((state) => ({ 
@@ -54,7 +54,7 @@ export const useEndPointStore = create(
                    url: `/endpointdrop`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) { 
 
@@ -81,7 +81,7 @@ export const useEndPointStore = create(
                    url: `/endpoints/${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   set((state) => ({ 
@@ -106,7 +106,7 @@ export const useEndPointStore = create(
                    url: `/feature_endpoint/${endpoint_id}?feature_id=${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   get().getSingleEndPoint(endpoint_id)
@@ -128,7 +128,7 @@ export const useEndPointStore = create(
                    url: `/feature_endpoint/${endpoint_id}?feature_id=${id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                }).then(function (response) {
                   get().getSingleEndPoint(endpoint_id)
@@ -185,7 +185,7 @@ export const useEndPointStore = create(
                    url: `/endpoints/${data?.id}`,
                    headers: {
                        'Content-Type': 'application/json',
-                       'X-APP-TOKEN' : `Bearer ${token}`
+                       'X-APP-TOKEN' : token
                    },
                    data: data
                }).then(function (response) {           
@@ -207,7 +207,7 @@ export const useEndPointStore = create(
                        url: `/endpoints`,
                        headers: {
                            'Content-Type': 'application/json',
-                           'X-APP-TOKEN' : `Bearer ${token}`
+                           'X-APP-TOKEN' : token
                        },
                        data: data
                    }).then(function (response) {               
@@ -228,7 +228,7 @@ export const useEndPointStore = create(
                            url: `/endpoints/${id}`,
                            headers: {
                                'Content-Type': 'application/json',
-                               'X-APP-TOKEN' : `Bearer ${token}`
+                               'X-APP-TOKEN' : token
                            },
                        }).then(function (response) {           
                             get().getEndPoints()
@@ -248,7 +248,7 @@ export const useEndPointStore = create(
                 url: `/endpoints/${id}?active=${status.toString()}`,
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-APP-TOKEN' : `Bearer ${token}`
+                    'X-APP-TOKEN' : token
                 },
             }).then(function (response) {
                 console.log(response)
