@@ -192,7 +192,9 @@ export function AddRolesForm(){
     }
 
 export function RolePage(){ 
-        //render checks
+        
+    //  
+    //render checks
         const feature_check = useCheckFeatures("role_write")
         const page_check = useCheckPage("Page") 
 
@@ -206,6 +208,8 @@ export function RolePage(){
         const filter_value = useRoleStore((state)=>state.filter)
         const setFiltervalue = useRoleStore((state)=>state.setFilterValue)
         const renderData = useRoleStore((state)=>state.filtered_roles)
+        const totalRoles = useRoleStore((state)=>state.total)
+        const activePercentage = useRoleStore((state)=>state.activeRoleCounts)
         
         //  pagination states   
         const page = useRoleStore((state)=>state.page)
@@ -231,13 +235,20 @@ export function RolePage(){
             <div className={myContainer}>
                 <title>Roles</title>
                 <ErrorBoundary>
-                    <div className="w-full  h-96 flex flex-col overflow-y-scroll scrollbar-none md:flex-row items-stretch justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
-                        <div className=' flex w-full md:w-6/12  h-full items-center justify-center'>
-                    
-                        <Pie data={data} height="65%" options={{ maintainAspectRatio: false }}/>
+                    <div className="w-full h-56 overflow-y-hidden flex flex-col px-2 md:flex-row justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
+                    <div className="stats mx-10 w-full overflow-hidden shadow">
+  
+                        <div className="stat">
+                            <div className="stat-title">Total Blue UMS Roles </div>
+                            <div className="stat-value ">{totalRoles} Roles </div>
+                            <div className="stat-desc">user can assume</div>
                         </div>
-                        <div className='flex w-full md:w-6/12  h-full items-center justify-center'>
-                        <Bar data={data} height="70%" options={{ maintainAspectRatio: false }} />
+                        
+                        <div className="stat">
+                            <div className="stat-title"> Active Role</div>
+                            <div className="stat-value ">{activePercentage() != "NaN" ? activePercentage()+"%" : "" } </div>
+                            <div className="stat-desc"> Are active from this Page</div>                       
+                        </div>             
                         </div>
                     </div>
                 </ErrorBoundary>
@@ -570,9 +581,9 @@ export function EditableSingleRoleComponent( {id , endpoints} ){
                     <div  className={!edit ? "w-full py-1  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto": "hidden"}>
                         <div className="flex bg-gray-50 font-bold text-2xl w-full justify-center items-center">
                             <p> {app?.name}</p>
-                        </div>
-                        
+                        </div> 
                     </div>
+                    
                     <ErrorBoundary>
                     <div  className={edit ? "w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
                         <div className="flex bg-gray-50 w-1/12 justify-center items-center">
@@ -617,165 +628,154 @@ export function EditableSingleRoleComponent( {id , endpoints} ){
                     </div>        
                     </ErrorBoundary>
                     <br/>
-                    <div className="w-full flex items-stretch justify-start h-full ">
-                        <div className="w-full tabs">
-                        <div className="tab-list flex flex-row p-1 bg-blue-100 flex-wrap space-x-1">
-                                <div className="tab" onClick={()=>setTabToken(1)}>
-                                    <TabNormalButton index={1}  token={tabToken} label="Use Cases" />
+                    <div role="tablist" className="tabs tabs-lifted w-full">
+                            <a  name="my_tabs_2" onClick={()=>setTabToken(1)} role="tab" className={`tab ${tabToken == 1 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> UseCases </a>
+                            <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                                <div className="flex w-ful content-center items-center justify-center h-full  p-0">
+                                <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
+                                    <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
+                                        <div className="px-6 py-4">
+                                            <div className="font-bold text-xl mb-2">Updating  Role Attribute</div>
+                                            <p className="text-gray-700 text-base">
+                                            Updating role included changing description and status,and which app the role belongs to.
+                                            </p>
+                                        </div>
+                                        <div className="px-6 pt-4 pb-2">
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#updaterole</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
+                                        </div>
+                                    </div>
+                                    <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                                        <div className="px-6 py-4">
+                                            <div className="font-bold text-xl mb-2">Disable Role </div>
+                                            <p className="text-gray-700 text-base">
+                                            If Role  is Disabled "True"; the user with this specfic role will not be able to access endpoints asscocaited with the role.
+                                            
+                                            </p>
+                                        </div>
+                                        <div className="px-6 pt-4 pb-2">
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#disable</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#enable</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#role</span>
+                                        </div>
+                                    </div> 
+                                    <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                                        <div className="px-6 py-4">
+                                            <div className="font-bold text-xl mb-2">Add Features To Roles </div>
+                                            <p className="text-gray-700 text-base">
+                                            As long as the attached feature is active;Role will have Access to Operations on 
+                                            Endpoints grouped with te feature.
+                                            </p>
+                                        </div>
+                                        <div className="px-6 pt-4 pb-2">
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#addfeature</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#torole</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#blueadmin</span>
+                                        </div>
+                                    </div>
+                                    <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                                        <div className="px-6 py-4">
+                                            <div className="font-bold text-xl mb-2">Remove Features From Roles </div>
+                                            <p className="text-gray-700 text-base">
+                                            Removes related Features with the role.
+                                            </p>
+                                        </div>
+                                        <div className="px-6 pt-4 pb-2">
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                                        </div>
+                                    </div>  
                                 </div>
-                                <div className="tab" onClick={()=>setTabToken(2)}>
-                                    <TabNormalButton index={2} token={tabToken} label="Features" />
                                 </div>
-                                <div className={`tab ${feature_check ? "": "hidden" } `} onClick={()=>setTabToken(3)} >
-                                    <TabNormalButton index={3} token={tabToken} label="Operations" />
-                                </div> 
-                                <div className="tab" onClick={()=>setTabToken(4)} >
-                                    <TabNormalButton index={4} token={tabToken} label="Endpoints" />
-                                </div>
-                                <div className={`tab ${feature_check ? "": "hidden" }`} onClick={()=>setTabToken(5)} >
-                                    <TabNormalButton index={5} token={tabToken} label="App" />
-                                </div>   
-                        </div>
-                        <div className={tabToken == 1 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                            <div className="flex w-full content-center items-center justify-center h-full  p-0">
-                            <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
-                                <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">Updating  Role Attribute</div>
-                                        <p className="text-gray-700 text-base">
-                                        Updating role included changing description and status,and which app the role belongs to.
-                                        </p>
-                                    </div>
-                                    <div className="px-6 pt-4 pb-2">
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#updaterole</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
-                                    </div>
-                                </div>
-                                <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">Disable Role </div>
-                                        <p className="text-gray-700 text-base">
-                                        If Role  is Disabled "True"; the user with this specfic role will not be able to access endpoints asscocaited with the role.
-                                        
-                                        </p>
-                                    </div>
-                                    <div className="px-6 pt-4 pb-2">
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#disable</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#enable</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#role</span>
-                                    </div>
-                                </div> 
-                                <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">Add Features To Roles </div>
-                                        <p className="text-gray-700 text-base">
-                                        As long as the attached feature is active;Role will have Access to Operations on 
-                                        Endpoints grouped with te feature.
-                                        </p>
-                                    </div>
-                                    <div className="px-6 pt-4 pb-2">
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#addfeature</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#torole</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#blueadmin</span>
-                                    </div>
-                                </div>
-                                <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">Remove Features From Roles </div>
-                                        <p className="text-gray-700 text-base">
-                                        Removes related Features with the role.
-                                        </p>
-                                    </div>
-                                    <div className="px-6 pt-4 pb-2">
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
-                                    </div>
-                                </div>  
                             </div>
+
+                            <a name="my_tabs_2" onClick={()=>setTabToken(2)}  role="tab" className={`tab ${tabToken == 2 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="Features"> Features </a>
+                            <div role="tabpanel" className="tab-content bg- bg-gray-200  border-base-300 rounded-box p-6">
+                                <ErrorBoundary>
+                                <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
+                                        <div></div>
+                                        <div className='w-full flex  items-center justify-center bg-gray-50 font-bold text-xl'> 
+                                        <p>
+                                        Features Asscociated With this Role
+                                        </p>
+                                        </div>
+                                        {                                                                           
+                                            item?.features?.map((feature,index)=>{
+                                                return (
+                                                    <div key={index+feature?.name} className="flex w-4/12 rounded-2x  p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                                        <div className="w-10/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-sky-100 break-all p-1 flex items-center justify-center">
+                                                            <p className="text-ellipsis">{feature?.name}</p>
+                                                        </div>
+                                                        <div className={`${feature_check ? "": "hidden" } w-2/12 flex items-center justify-center bg-slate-300`}>
+                                                            <ErrorBoundary>
+                                                                <DeleteRoleFeatureButton feature_id={feature?.id} role_id={item?.id} />
+                                                            </ErrorBoundary>
+                                                        </div>
+                                                    </div>
+                                                    )
+                                                })                                       
+                                        } 
+                                </div>
+                                <br/>
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                    <AddFeatureToRoleForm role_id={item?.id} />
+                                </ErrorBoundary>
+                            </div>
+
+                            <a name="my_tabs_2" onClick={()=>setTabToken(3)}  role="tab" className={`tab ${tabToken == 3 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="Operations" >Operations</a>
+                            <div role="tabpanel" className="tab-content bg-gray-200 border-base-300 rounded-box p-6">
+                                <div className="flex w-4/12 flex-col items-center justify-center h-full ">
+                                    <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
+                                    
+                                        <ErrorBoundary>
+                                            { item.active ?
+                                            <DeactivateRoleButton role_id={item?.id} /> :
+                                            <ActivateRoleButton  role_id={item?.id}/>
+            
+                                            }
+                                        </ErrorBoundary>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a name="my_tabs_2" onClick={()=>setTabToken(4)}  role="tab" className={`tab ${tabToken == 4 ? "tab-active" : ""} ${feature_check ? "": "hidden" }  [--tab-bg:white] [--tab-border-color:black]`} aria-label="EndPoints" >EndPoints</a>
+                            <div role="tabpanel" className="tab-content bg-gray-200 border-base-300 rounded-box p-6">
+                                <ErrorBoundary>
+                                    <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
+                                            <div></div>
+                                            <div className='w-full flex  items-center justify-center bg-sky-50 font-bold text-xl'> 
+                                            <p>
+                                            Endpoints that can be accesed with this Role
+                                            </p>
+                                            </div>
+                                            {                                                                        
+                                            endpoints?.map((endpoint,index)=>{
+                                                return (
+                                                    <div key={index+endpoint?.name} className="flex w-3/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                                        <div className="w-full text-sm text-nowrap  overflow-hidden  text-ellipsis bg-sky-100 break-all p-1 flex items-center justify-center">
+                                                            <p className="text-ellipsis">{endpoint?.name}</p>
+                                                        </div>
+                                                    </div>
+                                                    )
+                                                })   
+                                            } 
+                                    </div>
+                                    <br/>
+                                </ErrorBoundary>
                             </div>
                         
-                        </div>
-                        <div className={tabToken == 2 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                            <ErrorBoundary>
-                            <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
-                                    <div></div>
-                                    <div className='w-full flex  items-center justify-center bg-sky-50 font-bold text-xl'> 
-                                    <p>
-                                    Features Asscociated With this Role
-                                    </p>
-                                    </div>
-                                    {                                                                           
-                                        item?.features?.map((feature,index)=>{
-                                            return (
-                                                <div key={index+feature?.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                                    <div className="w-10/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
-                                                        <p className="text-ellipsis">{feature?.name}</p>
-                                                    </div>
-                                                    <div className={`${feature_check ? "": "hidden" } w-2/12 flex items-center justify-center bg-slate-300`}>
-                                                        <ErrorBoundary>
-                                                            <DeleteRoleFeatureButton feature_id={feature?.id} role_id={item?.id} />
-                                                        </ErrorBoundary>
-                                                    </div>
-                                                </div>
-                                                )
-                                            })                                       
-                                    } 
+                            <a name="my_tabs_2" onClick={()=>setTabToken(5)}  role="tab" className={`tab ${tabToken == 5 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black] `} aria-label="App">App</a>
+                            <div role="tabpanel" className="tab-content bg-gray-200 border-base-300 rounded-box p-6">
+                                <ErrorBoundary>
+                                    <AddAppToRoleForm role_id={item?.id} />
+                                </ErrorBoundary>
                             </div>
-                            <br/>
-                            </ErrorBoundary>
-                            <ErrorBoundary>
-                                <AddFeatureToRoleForm role_id={item?.id} />
-                            </ErrorBoundary>
-                        </div>
-                        <div className={tabToken == 3 ? "tab-panel w-full flex flex-row flex-wrap items-stretch justify-start pt-5 pb-8" : "hidden"} >
-                            <div className="flex w-4/12 flex-col items-center justify-center h-full ">
-                                <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                                
-                                    <ErrorBoundary>
-                                        { item.active ?
-                                        <DeactivateRoleButton role_id={item?.id} /> :
-                                        <ActivateRoleButton  role_id={item?.id}/>
-        
-                                        }
-                                    </ErrorBoundary>
-                                </div>
-                                
-                            </div>                                        
-                        </div> 
-                        <div className={tabToken == 4 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                        <ErrorBoundary>
-                            <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
-                                    <div></div>
-                                    <div className='w-full flex  items-center justify-center bg-sky-50 font-bold text-xl'> 
-                                    <p>
-                                    Endpoints that can be accesed with this Role
-                                    </p>
-                                    </div>
-                                    {                                                                        
-                                    endpoints?.map((endpoint,index)=>{
-                                        return (
-                                            <div key={index+endpoint?.name} className="flex w-3/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                                <div className="w-full text-sm text-nowrap  overflow-hidden  text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
-                                                    <p className="text-ellipsis">{endpoint?.name}</p>
-                                                </div>
-                                            </div>
-                                            )
-                                        })   
-                                    } 
-                            </div>
-                                <br/>
-                            </ErrorBoundary>
-                        </div>   
-                        <div className={tabToken == 5 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                            <ErrorBoundary>
-                                <AddAppToRoleForm role_id={item?.id} />
-                            </ErrorBoundary>
-                        </div>
-                        </div> 
-                    </div>
-                    
+                                    
+                    </div> 
+                                       
                 </Fragment>
                 )
         }
@@ -911,156 +911,155 @@ export function EditableSingleRoleComponentMobile({id, endpoints}){
                         </button>
                     </div>
         
-                    {/* <div className="flex justify-center items-center w-1/2 p-1 bg-gray-100 ">
-                        
-                    </div>  */}
                 
-                    <div className={ view ? "w-full flex flex-row justify-center" : "hidden" }>
-                    <div className="w-full tabs">
-                    <div className="tab-list text-sm flex flex-row bg-b flex-wrap break-all justify-start p-1 items-stretch space-x-1">
-                        <div></div>
-                        <div className="tab" onClick={()=>setTabToken(1)}>
-                            <TabNormalButton index={1}  token={tabToken} label="Use Cases" />
-                        </div>
-                        <div className="tab" onClick={()=>setTabToken(2)}>
-                            <TabNormalButton index={2} token={tabToken} label="Features" />
-                        </div>
-                        <div className={`tab ${feature_check ? "": "hidden" } `} onClick={()=>setTabToken(3)} >
-                            <TabNormalButton index={3} token={tabToken} label="Operations" />
-                        </div>
-                        <div className="tab" onClick={()=>setTabToken(4)} >
-                            <TabNormalButton index={4} token={tabToken} label="Endpoints" />
-                        </div>
-                        <div className={`tab ${feature_check ? "": "hidden" }`} onClick={()=>setTabToken(5)} >
-                            <TabNormalButton index={5} token={tabToken} label="App" />
-                        </div>
-                    </div>
-                    <div className={tabToken == 1 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                            <div className="flex w-full content-center items-center justify-center h-full  p-0">
-                            <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
-                                <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">Updating  Role Attribute</div>
-                                        <p className="text-gray-700 text-base">
-                                        Updating role included changing description and status,and which app the role belongs to.
-                                        </p>
-                                    </div>
-                                    <div className="px-6 pt-4 pb-2">
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#updaterole</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
-                                    </div>
-                                </div>
-                                <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">Disable Role </div>
-                                        <p className="text-gray-700 text-base">
-                                        If Role  is Disabled "True"; the user with this specfic role will not be able to access endpoints asscocaited with the role.
-                                        
-                                        </p>
-                                    </div>
-                                    <div className="px-6 pt-4 pb-2">
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#disable</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#enable</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#role</span>
-                                    </div>
-                                </div> 
-                                <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">Add Features To Roles </div>
-                                        <p className="text-gray-700 text-base">
-                                        As long as the attached feature is active;Role will have Access to Operations on 
-                                        Endpoints grouped with te feature.
-                                        </p>
-                                    </div>
-                                    <div className="px-6 pt-4 pb-2">
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#addfeature</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#torole</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#blueadmin</span>
-                                    </div>
-                                </div>
-                                <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                                    <div className="px-6 py-4">
-                                        <div className="font-bold text-xl mb-2">Remove Features From Roles </div>
-                                        <p className="text-gray-700 text-base">
-                                        Removes related Features with the role.
-                                        </p>
-                                    </div>
-                                    <div className="px-6 pt-4 pb-2">
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
-                                    </div>
-                                </div>  
-                            </div>
-                            </div>
-                        
-                    </div>
-                    <div className={tabToken == 2 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                        <ErrorBoundary>
-                        <div  className="w-full bg-gray-50 text-sm flex flex-row flex-wrap items-stretch justify-start h-auto">
-                                {
-                                item?.features?.map((feature,index)=>{
-                                    return (
-                                        <div key={index+feature?.name} className="flex w-6/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                            <div className="w-9/12 bg-slate-400 break-all p-1 flex overflow-hidden text-nowrap text-ellipsis items-center justify-center">
-                                                <p>{feature?.name}</p>
-                                            </div>
-                                            <div className={`w-3/12 flex items-center ${feature_check ? "": "hidden" } justify-center bg-slate-300`}>
-                                                <ErrorBoundary>
-                                                    <DeleteRoleFeatureButton feature={feature.id} role_id={item.id} />
-                                                </ErrorBoundary>
-                                            </div>
+                    <div className={ view ? "w-full  flex flex-auto justify-center" : "hidden" }>
+                    <div role="tablist" className="tabs tabs-lifted w-full">
+                            <a  name="my_tabs_2" onClick={()=>setTabToken(1)} role="tab" className={`tab ${tabToken == 1 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> UseCases </a>
+                            <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                                <div className="flex w-ful content-center items-center justify-center h-full  p-0">
+                                <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
+                                    <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
+                                        <div className="px-6 py-4">
+                                            <div className="font-bold text-xl mb-2">Updating  Role Attribute</div>
+                                            <p className="text-gray-700 text-base">
+                                            Updating role included changing description and status,and which app the role belongs to.
+                                            </p>
                                         </div>
-                                        )
-                                    })  
-                                }
-                        </div>
-                            <br/>
-                        </ErrorBoundary>
-                        <ErrorBoundary>
-                         <AddFeatureToRoleForm role_id={item?.id} />
-                        </ErrorBoundary>
-                    </div>
-                    <div className={tabToken == 3 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                   
-                        <div className="flex w-10/12 flex-col items-center justify-center h-full ">
-                            <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                            
+                                        <div className="px-6 pt-4 pb-2">
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#updaterole</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
+                                        </div>
+                                    </div>
+                                    <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                                        <div className="px-6 py-4">
+                                            <div className="font-bold text-xl mb-2">Disable Role </div>
+                                            <p className="text-gray-700 text-base">
+                                            If Role  is Disabled "True"; the user with this specfic role will not be able to access endpoints asscocaited with the role.
+                                            
+                                            </p>
+                                        </div>
+                                        <div className="px-6 pt-4 pb-2">
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#disable</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#enable</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#role</span>
+                                        </div>
+                                    </div> 
+                                    <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                                        <div className="px-6 py-4">
+                                            <div className="font-bold text-xl mb-2">Add Features To Roles </div>
+                                            <p className="text-gray-700 text-base">
+                                            As long as the attached feature is active;Role will have Access to Operations on 
+                                            Endpoints grouped with te feature.
+                                            </p>
+                                        </div>
+                                        <div className="px-6 pt-4 pb-2">
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#addfeature</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#torole</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#blueadmin</span>
+                                        </div>
+                                    </div>
+                                    <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                                        <div className="px-6 py-4">
+                                            <div className="font-bold text-xl mb-2">Remove Features From Roles </div>
+                                            <p className="text-gray-700 text-base">
+                                            Removes related Features with the role.
+                                            </p>
+                                        </div>
+                                        <div className="px-6 pt-4 pb-2">
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
+                                            <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                                        </div>
+                                    </div>  
+                                </div>
+                                </div>
+                            </div>
+
+                            <a name="my_tabs_2" onClick={()=>setTabToken(2)} role="tab" className={`tab ${tabToken == 2 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="Features"> Features </a>
+                            <div role="tabpanel" className="tab-content bg-gray-200 border-base-300 rounded-box p-6">
                                 <ErrorBoundary>
-                                    { item?.active ?
-                                    <DeactivateRoleButton role_id={item.id} /> :
-                                    <ActivateRoleButton  role_id={item.id}/>
-                                    }
+                                <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
+                                        <div></div>
+                                        <div className='w-full flex  items-center justify-center bg-sky-50 font-bold text-xl'> 
+                                        <p>
+                                        Features Asscociated With this Role
+                                        </p>
+                                        </div>
+                                        {                                                                           
+                                            item?.features?.map((feature,index)=>{
+                                                return (
+                                                    <div key={index+feature?.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                                        <div className="w-10/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-sky-100 break-all p-1 flex items-center justify-center">
+                                                            <p className="text-ellipsis">{feature?.name}</p>
+                                                        </div>
+                                                        <div className={`${feature_check ? "": "hidden" } w-2/12 flex items-center justify-center bg-slate-300`}>
+                                                            <ErrorBoundary>
+                                                                <DeleteRoleFeatureButton feature_id={feature?.id} role_id={item?.id} />
+                                                            </ErrorBoundary>
+                                                        </div>
+                                                    </div>
+                                                    )
+                                                })                                       
+                                        } 
+                                </div>
+                                <br/>
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                    <AddFeatureToRoleForm role_id={item?.id} />
                                 </ErrorBoundary>
                             </div>
-                        </div>            
-                    </div>    
-                    <div className={tabToken == 4 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                    <ErrorBoundary>
-                        <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
-                                <div></div>
-                                {                                                                        
-                                 endpoints?.map((endpoint,index)=>{
-                                    return (
-                                        <div key={index+endpoint?.name} className="flex w-3/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                            <div className="w-full text-sm text-nowrap  overflow-hidden  text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
-                                                <p className="text-ellipsis">{endpoint?.name}</p>
+
+                            <a name="my_tabs_2" onClick={()=>setTabToken(3)}  role="tab" className={`tab ${tabToken == 3 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="Operations" >Operations</a>
+                            <div role="tabpanel" className="tab-content bg-gray-200 border-base-300 rounded-box p-6">
+                                <div className="flex w-4/12 flex-col items-center justify-center h-full ">
+                                    <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
+                                    
+                                        <ErrorBoundary>
+                                            { item.active ?
+                                            <DeactivateRoleButton role_id={item?.id} /> :
+                                            <ActivateRoleButton  role_id={item?.id}/>
+            
+                                            }
+                                        </ErrorBoundary>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a name="my_tabs_2" onClick={()=>setTabToken(4)}  role="tab" className={`tab ${tabToken == 4 ? "tab-active" : ""} ${feature_check ? "": "hidden" }  [--tab-bg:white] [--tab-border-color:black]`} aria-label="EndPoints" >EndPoints</a>
+                            <div role="tabpanel" className="tab-content bg-gray-200 border-base-300 rounded-box p-6">
+                                <ErrorBoundary>
+                                    <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
+                                            <div></div>
+                                            <div className='w-full flex  items-center justify-center bg-sky-50 font-bold text-xl'> 
+                                            <p>
+                                            Endpoints that can be accesed with this Role
+                                            </p>
                                             </div>
-                                        </div>
-                                        )
-                                    })   
-                                } 
-                        </div>
-                            <br/>
-                        </ErrorBoundary>
-                    </div>
-                    <div className={tabToken == 5 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                        <ErrorBoundary>
-                            <AddAppToRoleForm role_id={item?.id} />
-                        </ErrorBoundary>
-                    </div>
-                    </div> 
+                                            {                                                                        
+                                            endpoints?.map((endpoint,index)=>{
+                                                return (
+                                                    <div key={index+endpoint?.name} className="flex w-3/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                                        <div className="w-full text-sm text-nowrap  overflow-hidden  text-ellipsis bg-sky-100 break-all p-1 flex items-center justify-center">
+                                                            <p className="text-ellipsis">{endpoint?.name}</p>
+                                                        </div>
+                                                    </div>
+                                                    )
+                                                })   
+                                            } 
+                                    </div>
+                                    <br/>
+                                </ErrorBoundary>
+                            </div>
+                        
+                            <a name="my_tabs_2" onClick={()=>setTabToken(5)}  role="tab" className={`tab ${tabToken == 5 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black] `} aria-label="App">App</a>
+                            <div role="tabpanel" className="tab-content bg-gray-200 border-base-300 rounded-box p-6">
+                                <ErrorBoundary>
+                                    <AddAppToRoleForm role_id={item?.id} />
+                                </ErrorBoundary>
+                            </div>
+                                    
+                    </div>  
                     </div>                             
                 </div>
                               

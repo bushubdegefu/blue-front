@@ -53,7 +53,7 @@ export function Dashboard(){
                             app_pages?.BlueAdmin.sort().map((page,index)=>{                     
                                 if (CheckRoles(page)){
                                     return (
-                                    <a key={page+index} className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
+                                    <a key={page+index+"pc"} className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
                                         href={"/"+page.toLowerCase().replace(/\s+/g, '')}	 onClick={null}> {page}
                                     </a> 
                                     )
@@ -82,7 +82,6 @@ export function Dashboard(){
 
 export function DashboardMobile(){
 
-    const [dropToggle,setDropToggle]=useState(false)
     const loggedIn = useLogInStore((state)=>state.blue_admin_token)
     const role_pages = useDashBoardStore((state)=>state.role_pages)
     const user_roles = useLogInStore((state)=>state.roles)
@@ -125,43 +124,77 @@ export function DashboardMobile(){
             </div> 
             <div className="flex w-10/12 justify-end flex-1 px-2">
                 <div className="flex items-stretch">
-                        <a href="/home" className="btn btn-ghost rounded-btn">Home</a>
-                        <div className="dropdown dropdown-end">
-                        <div tabIndex={0} role="button" className="btn btn-ghost rounded-btn">Admin Pages</div>
-                                <ul tabIndex={0} className="menu dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                                {
-                                                app_pages?.BlueAdmin.sort().map((page,index)=>{                     
-                                                    if (CheckRoles(page)){
-                                                        return (
-                                                        <li>
-                                                            <a key={page+index} className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
-                                                                href={"/"+page.toLowerCase().replace(/\s+/g, '')}	 onClick={null}> {page}
-                                                            </a>
-                                                        </li> 
-                                                        )
-                                                }  
-                                                return ""                               
-                                                })
-                                                    
-                                            }
-                                            { !loggedIn ?
-                                                    <li>
-                                                        <a className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
-                                                            href="/login" onClick={null}> Login
-                                                        </a> 
-                                                    </li>
-                                                    // <Link to={"/login"}></Link>
-                                                    :
-                                                    <li>
-                                                        <a className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
-                                                        href="/#"	 onClick={logout}> Logout
-                                                        </a> 
-                                                    </li>
-                                            }
-                                </ul>
-                        </div>
+                    <a href="/home" className="btn btn-ghost rounded-btn">Home</a>
+                    <div className="dropdown dropdown-end">
+                    <div tabIndex={0} role="button" className="btn btn-ghost rounded-btn">Admin Pages</div>
+                            <ul tabIndex={0} className="menu dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                            {
+                                            app_pages?.BlueAdmin.sort().map((page,index)=>{ 
+                                                                  
+                                                if (CheckRoles(page)){
+                                                    return (
+                                                    <li key={page+index+"mobile"}>
+                                                        <a  className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
+                                                            href={"/"+page.toLowerCase().replace(/\s+/g, '')}	 onClick={null}> {page}
+                                                        </a>
+                                                    </li> 
+                                                    )
+                                            }  
+                                            return ""                               
+                                            })
+                                                
+                                        }
+                                        { !loggedIn ?
+                                                <li>
+                                                    <a className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
+                                                        href="/login" onClick={null}> Login
+                                                    </a> 
+                                                </li>
+                                                :
+                                                <li>
+                                                    <a className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
+                                                    href="/#"	 onClick={logout}> Logout
+                                                    </a> 
+                                                </li>
+                                        }
+                            </ul>
+                    </div>
                 </div>
             </div>
         </div>            
+    )
+}
+
+
+
+export function DashboardPCBar(){
+
+    const logout = useLogInStore((state)=>state.resetTokenLogout)
+    const loggedIn = useLogInStore((state)=>state.blue_admin_token)
+    const user_email = useLogInStore((state)=>state.user_name)
+    return (
+        <div className="navbar w-full bg-base-100">
+            <div className="flex-1">
+                <a className="btn btn-ghost text-xl">{user_email}</a>
+            </div>
+            <div className="flex-none  justify-end">
+                <ul className="menu menu-horizontal px-1">
+                <li>
+                    <details>
+                    <summary>
+                        Status
+                    </summary>
+                    <ul className="p-2 bg-base-100 rounded-t-none">
+                        { !loggedIn ?
+                        <li><a href="/login" >Login</a></li>
+                            :
+                        <li><a href="#" onClick={logout}>Logout</a></li>
+                        }
+                    </ul>
+                    </details>
+                </li>
+                </ul>
+            </div>
+        </div>
     )
 }

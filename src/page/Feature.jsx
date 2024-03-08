@@ -202,6 +202,9 @@ export function FeaturePage(){
     const setPage = useFeatureStore((state)=>state.setPage)
     const setPageSize = useFeatureStore((state)=>state.setSize)
     const [sPage, setSpage]= useState(1)
+
+    const totalFeatures = useFeatureStore((state)=>state.total)
+    const activePercentage = useFeatureStore((state)=>state.activeFeatureCounts)  
     
     const page_check = useCheckPage("Feature")
     const feature_check = useCheckFeatures("features_write")
@@ -221,13 +224,19 @@ export function FeaturePage(){
         <div className={myContainer}>
         <title>Features</title>
         <ErrorBoundary>
-            <div className="w-full  h-72 flex flex-col overflow-y-scroll scrollbar-none md:flex-row items-stretch justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
-                <div className=' flex w-full md:w-6/12  h-full items-center justify-center'>
-            
-                <Pie data={data} height="65%" options={{ maintainAspectRatio: false }}/>
-                </div>
-                <div className='flex w-full md:w-6/12  h-full items-center justify-center'>
-                <Bar data={data} height="70%" options={{ maintainAspectRatio: false }} />
+            <div className="w-full  h-56 flex flex-col overflow-y-scroll scrollbar-none md:flex-row items-stretch justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
+                <div className="stats mx-10 w-full overflow-hidden shadow">    
+                    <div className="stat">
+                        <div className="stat-title">Total Blue UMS Features </div>
+                        <div className="stat-value ">{totalFeatures} </div>
+                        <div className="stat-desc">Total Features of the Service</div>
+                    </div>
+                    
+                    <div className="stat">
+                        <div className="stat-title"> Active Features</div>
+                        <div className="stat-value ">{activePercentage() != "NaN" ? activePercentage()+"%" : "" } </div>
+                        <div className="stat-desc"> Are active from this Page</div>                       
+                    </div>         
                 </div>
             </div>
         </ErrorBoundary>
@@ -539,133 +548,115 @@ export function EditableSingleFeatureComponent( {item} ){
                 </div>        
             </ErrorBoundary>
             <br/>
-            <div className="w-full flex items-stretch justify-start h-full ">
-                <div className="w-full tabs">
-                    <div className="tab-list flex flex-row p-1 bg-blue-100 flex-wrap space-x-1">
-                        <div className="tab" onClick={()=>setTabToken(1)}>
-                            <TabNormalButton index={1}  token={tabToken} label="Use Cases" />
-                        </div>
-                        <div className="tab" onClick={()=>setTabToken(2)}>
-                            <TabNormalButton index={2} token={tabToken} label="End Points" />
-                        </div>
-                        <div className={`tab ${feature_check ? "": "hidden" }`} onClick={()=>setTabToken(3)} >
-                            <TabNormalButton index={3} token={tabToken} label="Operations" />
-                        </div>
-                    
-                    </div>
-                    <div className={tabToken == 1 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                        <div className="flex w-full content-center items-center justify-center h-full  p-0">
-                        <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
-                            <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
-                                <div className="px-6 py-4">
-                                    <div className="font-bold text-xl mb-2">Adding Endpoints To System Feature</div>
-                                    <p className="text-gray-700 text-base">
-                                    Attaching and Endpoint to a feature provides access to endpoints 
-                                    to a a User that have this specfic role that contains this feature.
-                                    </p>
-                                </div>
-                                <div className="px-6 pt-4 pb-2">
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#featureendpoint</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
-                                </div>
+            <div role="tablist" className="tabs tabs-lifted w-full">
+                <a  name="my_tabs_2" onClick={()=>setTabToken(1)} role="tab" className={`tab ${tabToken == 1 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> UseCases </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                <div className="flex w-full content-center items-center justify-center h-full  p-0">
+                    <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
+                        <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
+                            <div className="px-6 py-4">
+                                <div className="font-bold text-xl mb-2">Adding Endpoints To System Feature</div>
+                                <p className="text-gray-700 text-base">
+                                Attaching and Endpoint to a feature provides access to endpoints 
+                                to a a User that have this specfic role that contains this feature.
+                                </p>
                             </div>
-                            <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                            
-                                <div className="px-6 py-4">
-                                    <div className="font-bold text-xl mb-2">Viewing  Available Endpoints </div>
-                                    <p className="text-gray-700 text-base">
-                                    Can View Available Endpoints Related to this feature
+                            <div className="px-6 pt-4 pb-2">
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#featureendpoint</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
+                            </div>
+                        </div>
+                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                        
+                            <div className="px-6 py-4">
+                                <div className="font-bold text-xl mb-2">Viewing  Available Endpoints </div>
+                                <p className="text-gray-700 text-base">
+                                Can View Available Endpoints Related to this feature
 
-                                    </p>
-                                </div>
-                                <div className="px-6 pt-4 pb-2">
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#feature</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#blueadmin</span>
-                                </div>
+                                </p>
                             </div>
-                            <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                            
-                                <div className="px-6 py-4">
-                                    <div className="font-bold text-xl mb-2">Disable Feature </div>
-                                    <p className="text-gray-700 text-base">
-                                    If feature Disabled value is "True"; it means endpoints associated with this feature will not be accessable.
-                                    
-                                    </p>
-                                </div>
-                                <div className="px-6 pt-4 pb-2">
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#feature</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#disable</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#endpoints</span>
-                                </div>
-                            </div> 
-                            <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                                <div className="px-6 py-4">
-                                    <div className="font-bold text-xl mb-2">Remove Endpoints From Features </div>
-                                    <p className="text-gray-700 text-base">
-                                    Removes an Endpoint asscocaiton with a Features.
-                                    </p>
-                                </div>
-                                <div className="px-6 pt-4 pb-2">
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#endpoint</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#remove</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#fromfeature</span>
-                                </div>
-                            </div>  
+                            <div className="px-6 pt-4 pb-2">
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#feature</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#blueadmin</span>
+                            </div>
                         </div>
-                        </div>
-                    
+                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                        
+                            <div className="px-6 py-4">
+                                <div className="font-bold text-xl mb-2">Disable Feature </div>
+                                <p className="text-gray-700 text-base">
+                                If feature Disabled value is "True"; it means endpoints associated with this feature will not be accessable.
+                                
+                                </p>
+                            </div>
+                            <div className="px-6 pt-4 pb-2">
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#feature</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#disable</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#endpoints</span>
+                            </div>
+                        </div> 
+                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                            <div className="px-6 py-4">
+                                <div className="font-bold text-xl mb-2">Remove Endpoints From Features </div>
+                                <p className="text-gray-700 text-base">
+                                Removes an Endpoint asscocaiton with a Features.
+                                </p>
+                            </div>
+                            <div className="px-6 pt-4 pb-2">
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#endpoint</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#remove</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#fromfeature</span>
+                            </div>
+                        </div>  
                     </div>
-                    <div className={tabToken == 2 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                        <ErrorBoundary>
-                                <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
-                                        <div></div>
-                                        {
-                                                                                                                
-                                        item?.endpoints?.map((endpoint,index)=>{
-                                            return (
-                                                <div key={index+endpoint?.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                                    <div className="w-10/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
-                                                        <p className="text-ellipsis">{endpoint?.name}</p>
-                                                    </div>
-                                                    <div className={`w-2/12 ${feature_check ? "": "hidden" } flex items-center justify-center bg-slate-300`}>
-                                                        <ErrorBoundary>
-                                                        <DeleteFeatureEndpointButton endpoint_id={endpoint.id} feature_id={item.id} />
-                                                        </ErrorBoundary>
-                                                    </div>
+                </div>
+                </div>
+                <a  name="my_tabs_2" onClick={()=>setTabToken(2)} role="tab" className={`tab ${tabToken == 2 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="End Points"> EndPoints </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                    <ErrorBoundary>
+                            <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
+                                    <div></div>
+                                    {                                                                       
+                                    item?.endpoints?.map((endpoint,index)=>{
+                                        return (
+                                            <div key={index+endpoint?.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                                <div className="w-10/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-sky-50 break-all p-1 flex items-center justify-center">
+                                                    <p className="text-ellipsis">{endpoint?.name}</p>
                                                 </div>
-                                                )
-                                            })   
-                                            
-                                        
-                                        } 
-                                </div>
-                                    <br/>
-                        </ErrorBoundary>
-                        <ErrorBoundary>
-                            <AddEndPointToFeatureForm feature_id={item.id} />
-                        </ErrorBoundary>    
-                    </div>
-                    <div className={tabToken == 3 ? "tab-panel w-full flex flex-row flex-wrap items-stretch justify-start pt-5 pb-8" : "hidden"} >
-                        <div className="flex w-4/12 flex-col items-center justify-center h-full ">
-                            <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                            
-                                <ErrorBoundary>
-                                    { item.active ?
-                                    <DeactivateFeatureButton feature_id={item.id} /> :
-                                    <ActivateFeatureButton  feature_id={item.id}/>
-
-                                    }
-                                </ErrorBoundary>
+                                                <div className={`w-2/12 ${feature_check ? "": "hidden" } flex items-center justify-center bg-slate-300`}>
+                                                    <ErrorBoundary>
+                                                    <DeleteFeatureEndpointButton endpoint_id={endpoint.id} feature_id={item.id} />
+                                                    </ErrorBoundary>
+                                                </div>
+                                            </div>
+                                            )
+                                        })                                       
+                                    } 
                             </div>
-                            
-                        </div>                             
-                    </div>    
-                    
-                </div> 
-            </div>
-            
+                            <br/>
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                        <AddEndPointToFeatureForm feature_id={item.id} />
+                    </ErrorBoundary>    
+                </div>
+                <a  name="my_tabs_2" onClick={()=>setTabToken(3)} role="tab" className={`tab ${tabToken == 3 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="Operations"> Operations </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                    <div className="flex w-4/12 flex-col items-center justify-center h-full ">
+                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
+                            <ErrorBoundary>
+                                { item.active ?
+                                <DeactivateFeatureButton feature_id={item.id} /> :
+                                <ActivateFeatureButton  feature_id={item.id}/>
+
+                                }
+                            </ErrorBoundary>
+                        </div>
+                    </div> 
+                </div>
+                
+            </div>            
         </Fragment>
     )
     }
@@ -815,125 +806,115 @@ export function EditableSingleFeatureComponentMobile({item}){
                 </div> 
             
                 <div className={ view ? "w-full flex flex-row justify-center" : "hidden" }>
-                <div className="w-full tabs">
-                <div className="tab-list flex flex-row bg-b p-1 flex-wrap space-x-1">
-                    <div className="tab" onClick={()=>setTabToken(1)}>
-                        <TabNormalButton index={1}  token={tabToken} label="Use Cases" />
-                    </div>
-                    <div className="tab" onClick={()=>setTabToken(2)}>
-                        <TabNormalButton index={2} token={tabToken} label="End Points" />
-                    </div>
-                    <div className= {`tab ${feature_check ? "": "hidden" }`} onClick={()=>setTabToken(3)} >
-                        <TabNormalButton index={3} token={tabToken} label="Operations" />
-                    </div>
-                 
-                </div>
-                <div className={tabToken == 1 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                        <div className="flex w-full content-center items-center justify-center h-full  p-0">
-                        <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
-                            <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
-                                <div className="px-6 py-4">
-                                    <div className="font-bold text-xl mb-2">Adding Endpoints To System Feature</div>
-                                    <p className="text-gray-700 text-base">
-                                    Attaching and Endpoint to a feature provides access to endpoints 
-                                    to a a User that have this specfic role that contains this feature.
-                                    </p>
-                                </div>
-                                <div className="px-6 pt-4 pb-2">
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#featureendpoint</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
-                                </div>
+                    <div role="tablist" className="tabs tabs-lifted w-full">
+                <a  name="my_tabs_2" onClick={()=>setTabToken(1)} role="tab" className={`tab ${tabToken == 1 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> UseCases </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                <div className="flex w-full content-center items-center justify-center h-full  p-0">
+                    <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
+                        <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
+                            <div className="px-6 py-4">
+                                <div className="font-bold text-xl mb-2">Adding Endpoints To System Feature</div>
+                                <p className="text-gray-700 text-base">
+                                Attaching and Endpoint to a feature provides access to endpoints 
+                                to a a User that have this specfic role that contains this feature.
+                                </p>
                             </div>
-                            <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                            
-                                <div className="px-6 py-4">
-                                    <div className="font-bold text-xl mb-2">Viewing  Available Endpoints </div>
-                                    <p className="text-gray-700 text-base">
-                                    Can View Available Endpoints Related to this feature
-
-                                    </p>
-                                </div>
-                                <div className="px-6 pt-4 pb-2">
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#feature</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#blueadmin</span>
-                                </div>
+                            <div className="px-6 pt-4 pb-2">
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#featureendpoint</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
                             </div>
-                            <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                            
-                                <div className="px-6 py-4">
-                                    <div className="font-bold text-xl mb-2">Disable Feature </div>
-                                    <p className="text-gray-700 text-base">
-                                    If feature Disabled value is "True"; it means endpoints associated with this feature will not be accessable.
-                                    
-                                    </p>
-                                </div>
-                                <div className="px-6 pt-4 pb-2">
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#feature</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#disable</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#endpoints</span>
-                                </div>
-                            </div> 
-                            <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                                <div className="px-6 py-4">
-                                    <div className="font-bold text-xl mb-2">Remove Endpoints From Features </div>
-                                    <p className="text-gray-700 text-base">
-                                    Removes an Endpoint asscocaiton with a Features.
-                                    </p>
-                                </div>
-                                <div className="px-6 pt-4 pb-2">
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#endpoint</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#remove</span>
-                                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#fromfeature</span>
-                                </div>
-                            </div>  
                         </div>
-                        </div>
-                    
-                    </div>
-                <div className={tabToken == 2 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                    <ErrorBoundary>
-                    <div  className="w-full bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
-                            {
-                            item?.endpoints?.map((endpoint,index)=>{
-                                return (
-                                    <div key={index+endpoint.name} className="flex w-6/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                        <div className="w-9/12 bg-slate-400 break-all p-1 flex items-center justify-center">
-                                            <p>{endpoint.name}</p>
-                                        </div>
-                                        <div className={`w-3/12 flex items-center justify-center bg-slate-300 ${feature_check ? "": "hidden" }`}>
-                                            <ErrorBoundary>
-                                                <DeleteFeatureEndpointButton endpoint_id={endpoint.id} feature_id={item.id} />
-                                            </ErrorBoundary>
-                                        </div>
-                                    </div>
-                                    )
-                                })  
-                            }
-                    </div>
-                        <br/>
-                    </ErrorBoundary>
-                    <ErrorBoundary>
-                    <AddEndPointToFeatureForm feature_id={item.id} />
-                    </ErrorBoundary>
-                </div>
-                <div className={tabToken == 3 ? `tab-panel w-full pt-5  pb-8` : "hidden"} >
-               
-                    <div className="flex w-10/12 flex-col items-center justify-center h-full ">
-                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
+                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
                         
+                            <div className="px-6 py-4">
+                                <div className="font-bold text-xl mb-2">Viewing  Available Endpoints </div>
+                                <p className="text-gray-700 text-base">
+                                Can View Available Endpoints Related to this feature
+
+                                </p>
+                            </div>
+                            <div className="px-6 pt-4 pb-2">
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#feature</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#blueadmin</span>
+                            </div>
+                        </div>
+                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                        
+                            <div className="px-6 py-4">
+                                <div className="font-bold text-xl mb-2">Disable Feature </div>
+                                <p className="text-gray-700 text-base">
+                                If feature Disabled value is "True"; it means endpoints associated with this feature will not be accessable.
+                                
+                                </p>
+                            </div>
+                            <div className="px-6 pt-4 pb-2">
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#feature</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#disable</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#endpoints</span>
+                            </div>
+                        </div> 
+                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                            <div className="px-6 py-4">
+                                <div className="font-bold text-xl mb-2">Remove Endpoints From Features </div>
+                                <p className="text-gray-700 text-base">
+                                Removes an Endpoint asscocaiton with a Features.
+                                </p>
+                            </div>
+                            <div className="px-6 pt-4 pb-2">
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#endpoint</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#remove</span>
+                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#fromfeature</span>
+                            </div>
+                        </div>  
+                    </div>
+                </div>
+                </div>
+                <a  name="my_tabs_2" onClick={()=>setTabToken(2)} role="tab" className={`tab ${tabToken == 2 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="End Points"> EndPoints </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                    <ErrorBoundary>
+                            <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
+                                    <div></div>
+                                    {                                                                       
+                                    item?.endpoints?.map((endpoint,index)=>{
+                                        return (
+                                            <div key={index+endpoint?.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                                <div className="w-10/12 text-sm text-nowrap  overflow-hidden  text-ellipsis bg-sky-50 break-all p-1 flex items-center justify-center">
+                                                    <p className="text-ellipsis">{endpoint?.name}</p>
+                                                </div>
+                                                <div className={`w-2/12 ${feature_check ? "": "hidden" } flex items-center justify-center bg-slate-300`}>
+                                                    <ErrorBoundary>
+                                                    <DeleteFeatureEndpointButton endpoint_id={endpoint.id} feature_id={item.id} />
+                                                    </ErrorBoundary>
+                                                </div>
+                                            </div>
+                                            )
+                                        })                                       
+                                    } 
+                            </div>
+                            <br/>
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                        <AddEndPointToFeatureForm feature_id={item.id} />
+                    </ErrorBoundary>    
+                </div>
+                <a  name="my_tabs_2" onClick={()=>setTabToken(3)} role="tab" className={`tab ${tabToken == 3 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="Operations"> Operations </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                    <div className="flex w-4/12 flex-col items-center justify-center h-full ">
+                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
                             <ErrorBoundary>
                                 { item.active ?
                                 <DeactivateFeatureButton feature_id={item.id} /> :
                                 <ActivateFeatureButton  feature_id={item.id}/>
+
                                 }
                             </ErrorBoundary>
                         </div>
-                    </div>            
-                </div>    
+                    </div> 
+                </div>
                 
-                </div> 
+                    </div>
                 </div>                             
             </div>
                           

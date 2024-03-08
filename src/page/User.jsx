@@ -107,6 +107,7 @@ export function UserPage(){
     const filter_value = useUserStore((state)=>state.filter)
     const setFiltervalue = useUserStore((state)=>state.setFilterValue)
     const renderData = useUserStore((state)=>state.filtered_users)
+    const myContainer=useStyle((state)=>state.styles.componentWorkingDiv) 
     //  pagination states
 
 
@@ -116,7 +117,8 @@ export function UserPage(){
     const setPage = useUserStore((state)=>state.setPage)
     const setPageSize = useUserStore((state)=>state.setSize)
     const [sPage, setSpage]= useState(1)
-    
+    const totalUsers = useUserStore((state)=>state.total)
+    const activePercentage = useUserStore((state)=>state.activeUserCounts)   
 
     useEffect(()=>{
         get_users()
@@ -130,17 +132,22 @@ export function UserPage(){
     };
 
     return (page_check ?
-        <>
-
+        <div className={myContainer}>
         <title>Users</title>
         <ErrorBoundary>
-        <div className="w-full  h-72 flex flex-col overflow-y-scroll scrollbar-none md:flex-row items-stretch justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
-            <div className=' flex w-full md:w-6/12  h-full items-center justify-center'>
-           
-            <Pie data={data} height="65%" options={{ maintainAspectRatio: false }}/>
-            </div>
-            <div className='flex w-full md:w-6/12  h-full items-center justify-center'>
-            <Bar data={data} height="70%" options={{ maintainAspectRatio: false }} />
+        <div className="w-full  h-56 overflow-y-hidden flex flex-col px-2 md:flex-row justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
+            <div className="stats mx-10 w-full overflow-hidden shadow">    
+                <div className="stat">
+                    <div className="stat-title">Total Blue UMS Users </div>
+                    <div className="stat-value ">{totalUsers} </div>
+                    <div className="stat-desc">Current Users of System</div>
+                </div>
+                
+                <div className="stat">
+                    <div className="stat-title"> Active Users</div>
+                    <div className="stat-value ">{activePercentage() != "NaN" ? activePercentage()+"%" : "" } </div>
+                    <div className="stat-desc"> Are active from this Page</div>                       
+                </div>         
             </div>
         </div>
         </ErrorBoundary>
@@ -217,7 +224,7 @@ export function UserPage(){
                 </div>        
             </div>
         </ErrorBoundary>
-        </>
+        </div>
         :
         <Navigate to="/home" />
     )
@@ -446,21 +453,9 @@ export function EditableSingleUserComponent( {item} ){
                 </div>        
             </ErrorBoundary>
             <br/>
-            <div className="w-full flex items-stretch justify-start h-full ">
-                <div className="w-full tabs">
-                    <div className="tab-list flex flex-row p-1 bg-blue-100 flex-wrap space-x-1">
-                        <div className="tab" onClick={()=>setTabToken(1)}>
-                            <TabNormalButton index={1}  token={tabToken} label="Use Cases" />
-                        </div>
-                        <div className="tab" onClick={()=>setTabToken(2)}>
-                            <TabNormalButton index={2} token={tabToken} label="Roles" />
-                        </div>
-                        <div className={`tab ${feature_check ? "": "hidden" }`} onClick={()=>setTabToken(3)} >
-                            <TabNormalButton index={3} token={tabToken} label="Operations" />
-                        </div>
-                    
-                    </div>
-                    <div className={tabToken == 1 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
+            <div role="tablist" className="tabs tabs-lifted w-full">
+                <a  name="my_tabs_2" onClick={()=>setTabToken(1)} role="tab" className={`tab ${tabToken == 1 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> UseCases </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
                         <div className="flex w-full content-center items-center justify-center h-full  p-0">
                         <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
                             <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
@@ -520,18 +515,22 @@ export function EditableSingleUserComponent( {item} ){
                             </div>  
                         </div>
                         </div>
-                    </div>
-                    <div className={tabToken == 2 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
+                </div>
+                <a  name="my_tabs_2" onClick={()=>setTabToken(2)} role="tab" className={`tab ${tabToken == 2 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> Roles </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
                         <ErrorBoundary>
                         <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
                                 <div></div>
-                                {
-                                
-                                                                        
+                                <div className='w-full flex  items-center justify-center bg-sky-50 font-bold text-xl'> 
+                                <p>
+                                Roles of User {item?.email}
+                                </p>
+                                </div>
+                                {                                                                       
                                 item.roles?.map((role,index)=>{
                                     return (
                                         <div key={index+role.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                            <div className="w-10/12 text-sm text-nowrap text-ellipsis bg-slate-400 break-all p-1 flex items-center justify-center">
+                                            <div className="w-10/12 text-sm text-nowrap text-ellipsis bg-sky-50 break-all p-1 flex items-center justify-center">
                                                 <p>{role.name}</p>
                                             </div>
                                             <div className={`w-2/12 flex items-center justify-center bg-slate-300 ${feature_check ? "": "hidden" }`}>
@@ -551,25 +550,25 @@ export function EditableSingleUserComponent( {item} ){
                         <ErrorBoundary>
                                 <AddRoleToUserForm user_id={item.id} />
                         </ErrorBoundary>
-                    </div>
-                    <div className={tabToken == 3 ? "tab-panel w-full flex flex-row flex-wrap items-stretch justify-start pt-5 pb-8" : "hidden"} >
-                        <div className="flex w-4/12 flex-col items-center justify-center h-full ">
-                            <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                            
-                                <ErrorBoundary>
-                                    { item.disabled ?
-                                    <ActivateUserButton  user_id={item.id}/>:
-                                    <DeactivateUserButton user_id={item.id} />
+                </div>
+                <a  name="my_tabs_2" onClick={()=>setTabToken(3)} role="tab" className={`tab ${tabToken == 3 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> Operations </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                    <div className="flex w-4/12 flex-col items-center justify-center h-full ">
+                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
+                        
+                            <ErrorBoundary>
+                                { item.disabled ?
+                                <ActivateUserButton  user_id={item.id}/>:
+                                <DeactivateUserButton user_id={item.id} />
 
-                                    }
-                                </ErrorBoundary>
-                            </div>
-                            
-                        </div>                   
-                    </div>    
-                    
-                </div> 
+                                }
+                            </ErrorBoundary>
+                        </div>  
+                    </div> 
+                </div>
+
             </div>
+           
             
         </Fragment>
         )
@@ -718,110 +717,120 @@ export function EditableSingleUserComponentMobile({item}){
                 </div> 
             
                 <div className={ view ? "w-full flex flex-row justify-center" : "hidden" }>
-                <div className="w-full tabs">
-                <div className="tab-list flex flex-row bg-b p-1 flex-wrap space-x-1">
-                    <div className="tab" onClick={()=>setTabToken(1)}>
-                        <TabNormalButton index={1}  token={tabToken} label="Use Cases" />
-                    </div>
-                    <div className="tab" onClick={()=>setTabToken(2)}>
-                        <TabNormalButton index={2} token={tabToken} label="Roles" />
-                    </div>
-                    <div className={`tab ${feature_check ? "": "hidden" } `} onClick={()=>setTabToken(3)} >
-                        <TabNormalButton index={3} token={tabToken} label="Operations" />
-                    </div>
-                 
-                </div>
-                <div className={tabToken == 1 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                <div className="flex w-full content-center items-center justify-center h-full  p-0">
-                    <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
-                        <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
-                            <div className="px-6 py-4">
-                                <div className="font-bold text-xl mb-2">Adding Roles To System User</div>
-                                <p className="text-gray-700 text-base">
-                                The Added Roles to Users refers to attaching privlege to a user to provided access to endpoints 
-                                that require the specified roles
-                                </p>
-                            </div>
-                            <div className="px-6 pt-4 pb-2">
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#adduserrole</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
-                            </div>
-                        </div>
-                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                        
-                            <div className="px-6 py-4">
-                                <div className="font-bold text-xl mb-2">Resetting User Password </div>
-                                <p className="text-gray-700 text-base">
-                                Resets Password to "default@123" and forces user to Change password when logging in.
-
-                                </p>
-                            </div>
-                            <div className="px-6 pt-4 pb-2">
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
-                            </div>
-                        </div>
-                        <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
-                            <div className="px-6 py-4">
-                                <div className="font-bold text-xl mb-2">Disable User </div>
-                                <p className="text-gray-700 text-base">
-                                If user Disabled value is "True"; it means user will not be allowed to login.
-                                </p>
-                            </div>
-                            <div className="px-6 pt-4 pb-2">
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
-                                <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
-                            </div>
-                        </div> 
-                    </div>
-                    </div>
-                
-                </div>
-                <div className={tabToken == 2 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >
-                    <ErrorBoundary>
-                    <div  className="w-full bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
-                            {
-                            item?.roles?.map((role,index)=>{
-                                return (
-                                    <div key={index+role.name} className="flex w-6/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
-                                        <div className="w-9/12 bg-slate-400 break-all p-1 flex items-center justify-center">
-                                            <p>{role.name}</p>
-                                        </div>
-                                        <div className={`w-3/12 ${feature_check ? "": "hidden" } flex items-center justify-center bg-slate-300`}>
-                                            <ErrorBoundary>
-                                                <DeleteUserRoleButton role_id={role.id} user_id={item.id} />
-                                            </ErrorBoundary>
-                                        </div>
+                    <div role="tablist" className="tabs tabs-lifted w-full">
+                        <a  name="my_tabs_2" onClick={()=>setTabToken(1)} role="tab" className={`tab ${tabToken == 1 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> UseCases </a>
+                        <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                            <div className="flex w-full content-center items-center justify-center h-full  p-0">
+                            <div className="flex flex-row flex-wrap m-1 items-stretch justify-start min-w-0 break-words w-full border-0 p-2">    
+                                <div className="max-w-sm rounded m-1 overflow-hidden  bg-blue-100 shadow-lg">   
+                                    <div className="px-6 py-4">
+                                        <div className="font-bold text-xl mb-2">Adding Roles To System User</div>
+                                        <p className="text-gray-700 text-base">
+                                        The Added Roles to Users refers to attaching privlege to a user to provided access to endpoints 
+                                        that require the specified roles
+                                        </p>
                                     </div>
-                                    )
-                                })  
-                            }
-                    </div>
-                        <br/>
-                    </ErrorBoundary>
-                    <ErrorBoundary>
-                    <AddRoleToUserForm user_id={item.id} />
-                    </ErrorBoundary>
-                </div>
-                <div className={tabToken == 3 ? "tab-panel w-full pt-5 pb-8" : "hidden"} >           
-                    <div className="flex w-10/12 flex-col items-center justify-center h-full ">
-                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                        
-                            <ErrorBoundary>
-                                { item.disabled ?
-                                <ActivateUserButton  user_id={item.id}/>:
-                                <DeactivateUserButton user_id={item.id} />
+                                    <div className="px-6 pt-4 pb-2">
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#adduserrole</span>
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#access</span>
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#systemdesign</span>
+                                    </div>
+                                </div>
+                                <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">        
+                                    <div className="px-6 py-4">
+                                        <div className="font-bold text-xl mb-2">Resetting User Password </div>
+                                        <p className="text-gray-700 text-base">
+                                        Resets Password to "default@123" and forces user to Change password when logging in.
 
-                                }
-                            </ErrorBoundary>
+                                        </p>
+                                    </div>
+                                    <div className="px-6 pt-4 pb-2">
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                                    </div>
+                                </div>
+                                <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg"> 
+                                    <div className="px-6 py-4">
+                                        <div className="font-bold text-xl mb-2">Disable User </div>
+                                        <p className="text-gray-700 text-base">
+                                        If user Disabled value is "True"; it means user will not be allowed to login.
+                                        
+                                        </p>
+                                    </div>
+                                    <div className="px-6 pt-4 pb-2">
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                                    </div>
+                                </div> 
+                                <div className="max-w-sm rounded m-1 overflow-hidden bg-blue-100 shadow-lg">
+                                    <div className="px-6 py-4">
+                                        <div className="font-bold text-xl mb-2">Remove Pages From Users </div>
+                                        <p className="text-gray-700 text-base">
+                                        Revokes access to the specified page to User if removed.
+                                        </p>
+                                    </div>
+                                    <div className="px-6 pt-4 pb-2">
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#photography</span>
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#travel</span>
+                                        <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">#winter</span>
+                                    </div>
+                                </div>  
+                            </div>
+                            </div>
                         </div>
-                    </div>            
-                </div>    
-                
-                </div> 
+                        <a  name="my_tabs_2" onClick={()=>setTabToken(2)} role="tab" className={`tab ${tabToken == 2 ? "tab-active" : ""} [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> Roles </a>
+                        <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                                <ErrorBoundary>
+                                <div  className="w-full  bg-gray-50 text-lg flex flex-row flex-wrap items-stretch justify-start h-auto">
+                                        <div></div>
+                                        <div className='w-full flex  items-center justify-center bg-sky-50 font-bold text-xl'> 
+                                        <p>
+                                        Roles of User {item?.email}
+                                        </p>
+                                        </div>
+                                        {                                                                       
+                                        item.roles?.map((role,index)=>{
+                                            return (
+                                                <div key={index+role.name} className="flex w-4/12 p-1 break-all bg-slate-50 rounded-tl-lg flex-row justify-start items-stretch" >
+                                                    <div className="w-10/12 text-sm text-nowrap text-ellipsis bg-sky-50 break-all p-1 flex items-center justify-center">
+                                                        <p>{role.name}</p>
+                                                    </div>
+                                                    <div className={`w-2/12 flex items-center justify-center bg-slate-300 ${feature_check ? "": "hidden" }`}>
+                                                        <ErrorBoundary>
+                                                            <DeleteUserRoleButton role_id={role.id} user_id={item.id} />
+                                                        </ErrorBoundary>
+                                                    </div>
+                                                </div>
+                                                )
+                                            })   
+                                            
+                                        
+                                        } 
+                                </div>
+                                    <br/>
+                                </ErrorBoundary>
+                                <ErrorBoundary>
+                                        <AddRoleToUserForm user_id={item.id} />
+                                </ErrorBoundary>
+                        </div>
+                        <a  name="my_tabs_2" onClick={()=>setTabToken(3)} role="tab" className={`tab ${tabToken == 3 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> Operations </a>
+                        <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                            <div className="flex w-4/12 flex-col items-center justify-center h-full ">
+                                <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
+                                
+                                    <ErrorBoundary>
+                                        { item.disabled ?
+                                        <ActivateUserButton  user_id={item.id}/>:
+                                        <DeactivateUserButton user_id={item.id} />
+
+                                        }
+                                    </ErrorBoundary>
+                                </div>  
+                            </div> 
+                        </div>
+                    </div>
                 </div>                             
             </div>
                           

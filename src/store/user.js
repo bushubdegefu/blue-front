@@ -146,6 +146,17 @@ export const useUserStore = create(
                 filtered_users : renderData
             }))
         },
+        activeUserCounts: () =>{
+            let renderData
+                renderData=get().users.filter(item => {
+                   return item.disabled.toString().toLowerCase().includes("false") 
+                })
+                let bottom = get().size > get().total ? get().total : get().size
+                 
+            let percentage =(renderData.length/bottom) * 100 
+            return percentage.toFixed(2)
+            
+        },
         patchUser: async (data) => { 
             console.log(data)
             let token = useLogInStore.getState().access_token;
@@ -178,7 +189,8 @@ export const useUserStore = create(
                            'Content-Type': 'application/json',
                            'X-APP-TOKEN' : token
                        },
-                       data: data
+                       data: { "email": data?.email,
+                                "password" : data?.password }
                    }).then(function (response) {               
                         get().getUsers()
                          

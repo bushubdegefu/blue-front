@@ -160,6 +160,17 @@ export const useRoleStore = create(
                 filtered_roles : renderData
             }))
         },
+        activeRoleCounts: () =>{
+            let renderData
+                renderData=get().roles.filter(item => {
+                   return item.active.toString().toLowerCase().includes("true") 
+                })
+                let bottom = get().size > get().total ? get().total : get().size
+                 
+            let percentage =(renderData.length/bottom) * 100 
+            return percentage.toFixed(2)
+            
+        },
         patchRole: async (data) => { 
             let token = useLogInStore.getState().access_token;
             await  blueClient.request({

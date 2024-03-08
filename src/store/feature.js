@@ -149,6 +149,17 @@ export const useFeatureStore = create(
             }))
             get().filterFeature()
         }, 
+        activeFeatureCounts: () =>{
+            let renderData
+                renderData=get().features.filter(item => {
+                   return item.active.toString().toLowerCase().includes("true") 
+                })
+                let bottom = get().size > get().total ? get().total : get().size
+                 
+            let percentage =(renderData.length/bottom) * 100 
+            return percentage.toFixed(2)
+            
+        },
         setPage: (value)=> {
             set((state) => ({ 
                 ...state,
