@@ -35,16 +35,14 @@ export function PasswordInput({ label, inputType, placeHolder,name, value, handl
     )
 }
 
-export function TextInput({ label, placeHolder,name , value, handler}){
+export function TextInput({ label, placeHolder,name , value, handler,cn}){
 
     return(
-
-        <div className="relative w-full mb-3">
-            <label className="block uppercase text-gray-600 text-xs font-bold mb-2" htmlFor="grid-password">{label}</label>
-            <textarea name={name} onChange={handler} aria-label={label} className="border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" placeholder={placeHolder} value={value} />
+        <div className="relative w-full mb-1">
+            <label className={`block uppercase  text-gray-600 text-xs font-bold mb-2`} htmlFor="grid-password">{label}</label>
+            <textarea name={name} onChange={handler} aria-label={label} className={`border-0 px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all ${cn ? cn : ""} duration-150`} placeholder={placeHolder} value={value} />
         </div>
-
-    )
+        )
 }
 
 export function CheckBoxInput({label,name,handler, value}){
@@ -80,8 +78,6 @@ export function SelectInput({ data, name,handler, label}){
     )
 }
 
-
-
 export function SingleInputNoLabel({ label, inputType, placeHolder,name, value, handler}){
 
     return(
@@ -94,9 +90,7 @@ export function SingleInputNoLabel({ label, inputType, placeHolder,name, value, 
 }
 
 export function TextInputNoLabel({ label, inputType, placeHolder,name, value, handler}){
-
     return(
-
         <div className="relative w-full flex justify-center items-center">
             <textarea name={name} type={inputType} onChange={handler} aria-label={label} className="border-0 resize-y px-3 py-3 placeholder-gray-300 text-gray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150" placeholder={placeHolder}  value={value}/>
         </div>
