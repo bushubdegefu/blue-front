@@ -3,12 +3,15 @@ import { SingleInput, CheckBoxInput, PasswordInput  } from "../components/Input"
 import { NormalButton } from "../components/Button"
 import { useUserStore } from "../store/user"
 import { ErrorBoundary } from "../components/ErrorBoundary"
+import useCheckPage from "../uitls/check_page"
+import { Navigate } from "react-router-dom"
 
 
 
 
 export function SignUpPage(){
-
+    
+    const page_check = useCheckPage("Sign Up")
     const postUser = useUserStore((state)=>state.postUser) 
 
     const [show,setShow]=useState(false)
@@ -30,7 +33,6 @@ export function SignUpPage(){
                 ...values,
                 "email": "",
                 "password": "",
-                "disabled": false
              }));
              setConpassword('')
         }
@@ -54,6 +56,8 @@ export function SignUpPage(){
     };
 
     return(
+        page_check ?
+
         <div className="items-start justify-center w-11/12 h-auto p-2 m-2">          
             <title>Register</title>
             <div className="flex w-full content-center items-center justify-center h-full">
@@ -98,13 +102,7 @@ export function SignUpPage(){
                                                     </div>
                                                 </div> : null
                                                 }      
-                                    <br/>
-                                    <CheckBoxInput
-                                    value={values.disabled} 
-                                    label="Disabled"
-                                    name="disabled"
-                                    handler={handleInputChange.bind(this)}
-                                    />
+                    
                                     <br/>
                                     <CheckBoxInput
                                     value={show} 
@@ -129,6 +127,8 @@ export function SignUpPage(){
          
        
         </div>
+        :
+        <Navigate to="/login" />
     )
     
 

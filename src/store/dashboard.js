@@ -18,7 +18,7 @@ export const useDashBoardStore = create(
             url: `/dashboardfeat?app_id=${get().app_id}`,
             headers: {
                 'Content-Type': 'application/json',
-                'X-APP-TOKEN' : token
+                'X-APP-TOKEN' : token ? token : "anonymous"
             },
         }).then(function (response) {               
             set((state) => ({ 
@@ -37,7 +37,7 @@ export const useDashBoardStore = create(
                url: `/dashboardpages?app_id=${get().app_id}`,
                headers: {
                    'Content-Type': 'application/json',
-                   'X-APP-TOKEN' : token
+                   'X-APP-TOKEN' : token  ? token : "anonymous"
                },
            }).then(function (response) {               
                set((state) => ({ 
@@ -58,7 +58,7 @@ export const useDashBoardStore = create(
                url: `/dashboardrolespage?app_id=${get().app_id}`,
                headers: {
                    'Content-Type': 'application/json',
-                   'X-APP-TOKEN' : token
+                   'X-APP-TOKEN' : token ? token : "anonymous"
                },
            }).then(function (response) {               
                set((state) => ({ 

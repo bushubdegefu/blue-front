@@ -114,9 +114,7 @@ export function AddAppForm(){
 }
 
 export function EditableGetAppComponent( {item, index} ){
-    const getMatrix = useAppStore((state)=>state.getAppMatrix)  
-    const app_matrix = useAppStore((state)=>state.app_matrix)
-    const [view,setView]=useState(false)
+    
     const [edit,setEdit]=useState(false)
     const patch = useAppStore((state)=>state.patchApp)
     const deleteEnd = useAppStore((state)=>state.deleteApp)
@@ -144,10 +142,7 @@ export function EditableGetAppComponent( {item, index} ){
         setEdit(false)
     }
     
-    const handleMatrix =(id)=>{
-        setView(!view)   
-        getMatrix(id)
-    }
+    
 
     const handleInputChange = (event) => {
         event.persist();
@@ -190,31 +185,9 @@ export function EditableGetAppComponent( {item, index} ){
                             </button>
                         </div>
                     </div>
-                    <div className={`flex flex-row h-10 justify-center ${feature_check ? "w-3/12" : "w-full"}` }  >
-                            <button onClick={()=>handleMatrix(item?.id)}>
-                            { view ? <TrayUpIcon /> : <TrayDownIcon /> }
-                            </button>
-                    </div>
+                    
                 </div>
             </div> 
-            <div  className={view ? "w-full min-h-86 bg-slate-400  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
-            <div className='flex items-center justify-center flex-col w-full h-full font-bold'> 
-                    <ErrorBoundary>
-                        {
-                            app_matrix?.map((x,index) =>{
-                                return(
-                                    <Fragment key={"Role"+index} >
-                                    <div className='p-2 w-full '>
-                                    <p className='capitalize'>{x?.role}</p>  
-                                    </div>
-                                    </Fragment>
-                                )
-                            })
-                        }
-                        </ErrorBoundary>
-
-                </div>
-            </div>
             <ErrorBoundary>
                 <div  className={edit ? "w-full  text-lg flex flex-row space-x-1 items-stretch justify-center h-auto" : "hidden"}>
                     <div className="flex bg-gray-50 w-1/12 justify-center items-center">

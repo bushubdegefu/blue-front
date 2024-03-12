@@ -111,13 +111,8 @@ export function HomePage(){
 
     return (
         <div className="w-full h-full flex flex-col py-3" >
-        <div className="mx-5 carousel carousel-center w-11/12 justify-center rounded-box">
-        <div className="placeholder">
-            <div className="bg-neutral text-neutral-content rounded-full w-24">
- 
-            
-            </div>
-            </div>
+        <div className="mx-5 carousel carousel-center bg-slate-50 w-11/12 justify-center rounded-box">
+        
             <img className=" 	aspect-ratio: auto; rounded-xl" src="/wing.svg" alt="wings" />
         </div>
         <div className="flex w-full flex-col">

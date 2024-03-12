@@ -24,6 +24,7 @@ export function Dashboard(){
         }
     },[loggedIn])
     
+
     const CheckRoles = (page_name) => {
         let result = false
         if (user_roles != null ){
@@ -37,6 +38,10 @@ export function Dashboard(){
                 }
                 
             }  
+        }else{
+            if(role_pages?.["Anonymous"].indexOf(page_name) > -1){
+                result = true
+            }
         }
             
         return result
@@ -63,10 +68,7 @@ export function Dashboard(){
                                 
                         }    
                         { !loggedIn ?
-                                <a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
-                                 	href="/login" onClick={null}> Login
-                                </a> 
-                                // <Link to={"/login"}></Link>
+                            ""
                                 :
                             <a className='text-xs uppercase px-10 py-2 hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
                             href="/#"	 onClick={logout}> Logout
@@ -112,6 +114,10 @@ export function DashboardMobile(){
                 }
                 
             }  
+        }else{
+            if(role_pages?.["Anonymous"].indexOf(page_name) > -1){
+                result = true
+            }
         }
             
         return result
@@ -145,11 +151,7 @@ export function DashboardMobile(){
                                                 
                                         }
                                         { !loggedIn ?
-                                                <li>
-                                                    <a className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'
-                                                        href="/login" onClick={null}> Login
-                                                    </a> 
-                                                </li>
+                                                ""
                                                 :
                                                 <li>
                                                     <a className='text-xs uppercase hover:bg-slate-300 font-bold block text-lightBlue-500 hover:text-lightBlue-600'

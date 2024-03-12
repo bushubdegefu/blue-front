@@ -13,7 +13,7 @@ export const useLogInStore = create(
         blue_admin_token :false,
         access_token : null,
         refresh_token : null,
-        roles: ["Anonymous"],
+        roles: null,
         user_name: null,
         user_id: null,
         responseError : null,  
