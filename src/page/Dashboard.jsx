@@ -173,7 +173,7 @@ export function DashboardPCBar(){
     const loggedIn = useLogInStore((state)=>state.blue_admin_token)
     const user_email = useLogInStore((state)=>state.user_name)
     return (
-        <div className="navbar w-full bg-base-100">
+        <div className="navbar w-full px-5 mx-1 bg-slate-100">
             <div className="flex-1">
                 <a className="btn btn-ghost text-xl">{user_email}</a>
             </div>
