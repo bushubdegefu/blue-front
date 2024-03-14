@@ -7,7 +7,7 @@ import { useLogInStore } from './login'
 export const useDashBoardStore = create(
     persist(
     (set,get) => ({
-    app_id :"   ",
+    app_id :"48015a9b-5a86-4a15-944b-94108aa78b4b",
     app_role_features : null,
     app_pages : null,
     role_pages: null,
@@ -46,9 +46,7 @@ export const useDashBoardStore = create(
                }))             
                  
                }).catch((response,error)=> {
-                   const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
-        
-                  
+                   const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"                  
                });
        },
     getRolePages: async () => {
