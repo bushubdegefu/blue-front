@@ -180,11 +180,34 @@ export const useUserStore = create(
                       
                    });
             },
-        postUser: async (data) => { 
+            patchUser: async (data) => { 
+                console.log(data)
                 let token = useLogInStore.getState().access_token;
                 await  blueClient.request({
-                       method: 'POST',
-                       url: `/users`,
+                       method: 'PATCH',
+                       url: `/users/${data?.id}`,
+                       headers: {
+                           'Content-Type': 'application/json',
+                           'X-APP-TOKEN' : token
+                       },
+                       data: data
+                   }).then(function (response) { 
+                                   
+                        get().getSingleUser(data?.id)
+                        get().getUsers()
+                     }).catch((response,error)=> {
+                           const responseError = response?.data?.details ? response?.data?.details : "Something Went Wrong, Try again"
+                           toast.error(responseError,{
+                               position: 'top-right'
+                             })
+                          
+                       });
+                },
+        changePassword: async (data,reset) => { 
+                let token = useLogInStore.getState().access_token;
+                await  blueClient.request({
+                       method: 'PUT',
+                       url: `/users?reset=${reset}`,
                        headers: {
                            'Content-Type': 'application/json',
                            'X-APP-TOKEN' : token

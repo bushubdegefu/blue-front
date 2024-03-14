@@ -16,8 +16,11 @@ export default function useCheckPage(page_name) {
                     break;
                 }
             }
-            
         }  
+    }else{
+        if(role_pages?.["Anonymous"].indexOf(page_name) > -1){
+            result = true
+        }
     }
     return result
 }

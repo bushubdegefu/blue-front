@@ -11,6 +11,7 @@ import { Pie ,Bar } from 'react-chartjs-2';
 import { SelectInput, SingleInput, ReadOnlySingleInputNoLabel, SingleInputNoLabel, CheckBoxInput } from "../components/Input"
 import useCheckFeatures from '../uitls/check_features';
 import { Navigate } from 'react-router-dom';
+import { useRoleStore } from '../store/role';
 import useCheckPage from '../uitls/check_page';
 
 export function PagesDropDown({ label, value  ,name, handler}){
@@ -123,7 +124,8 @@ export function AddPageForm(){
 }
 
 export function AddRoleToPageForm( {page_id}){
-    const addPageRole = usePageStore((state)=>state.addPageRole)   
+    const addPageRole = usePageStore((state)=>state.addPageRole)  
+   
     const [roleId, setRoleId] = useState();
     const handleClick =()=>{
        
@@ -139,7 +141,6 @@ export function AddRoleToPageForm( {page_id}){
       
     };
  
-
     return(
         <Fragment>
            <div className="flex w-full content-center items-center justify-center h-full ">
@@ -220,7 +221,6 @@ export function EditableGetPageComponent( {item, index} ){
        
     };
 
-   
     return (
     <Fragment key={'form-row'+index}>
         <div  className={edit ? "hidden" :"w-full  text-sm flex flex-row space-x-1 items-stretch justify-center h-auto"}>
@@ -567,9 +567,12 @@ export function BluePage(){
     const setPageSize = usePageStore((state)=>state.setSize)
     const [sPage, setSpage]= useState(1)
     
-
+    const getRoles = useRoleStore((state)=>state.getDropRoles)  
+    
+    
     useEffect(()=>{
         get_pages()
+        getRoles()
         
     },[])
 
@@ -581,7 +584,6 @@ export function BluePage(){
 
     return ( page_check ?
         <>
-
         <title>Pages</title>
         <ErrorBoundary>
         <div className="w-full  h-72 flex flex-col overflow-y-scroll scrollbar-none md:flex-row items-stretch justify-start py-5 my-2 bg-slate-100 shadow-xl overflow-x-hidden">
@@ -655,7 +657,6 @@ export function BluePage(){
                     </div>
                     <div className="mobile-block md:hidden w-full flex-auto px-4 lg:px-10 py-10 pt-0">            
                         <div className="w-full flex flex-col items-stretch h-auto space-y-1"> 
-                        
                         <ErrorBoundary>
                         {
                             renderData?.map((x,index) =>{       
@@ -664,12 +665,11 @@ export function BluePage(){
                                         <EditableGetPageComponentMobile item={x} index={index} />
                                     </Fragment>
                                 )    
-                                    })
+                                })
                         }
                         </ErrorBoundary>
                         </div>
                     </div>
-                
                 </div>        
             </div>
         </ErrorBoundary>

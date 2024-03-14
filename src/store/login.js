@@ -11,7 +11,7 @@ export const useLogInStore = create(
     persist(
         (set,get) => ({
         blue_admin_token :false,
-        access_token : null,
+        access_token : "anonymous",
         refresh_token : null,
         roles: null,
         user_name: null,
@@ -39,7 +39,7 @@ export const useLogInStore = create(
                     roles: user?.roles,
                     user_name: user?.email,
                     user_id: user?.uuid,
-                    access_token : `Bearer ${access_token}`,
+                    access_token : access_token,
                     refresh_token : refresh_token
                 }))
               

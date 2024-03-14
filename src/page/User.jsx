@@ -1,7 +1,7 @@
 import 'chart.js/auto';
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { RefreshIcon, TrashIcon, TrayDownIcon, TrayUpIcon, EditIcon, CancelIcon, UpdateIcon} from "../components/Icons";
-import {CheckBoxInput, ReadOnlySingleInputNoLabel, SingleInputNoLabel } from "../components/Input"
+import {CheckBoxInput, ReadOnlySingleInputNoLabel, SingleInput, SingleInputNoLabel } from "../components/Input"
 import { useEffect, Fragment, useState } from 'react';
 import { useUserStore } from '../store/user';
 import { Pagination } from '../components/Pagination';
@@ -246,6 +246,27 @@ export function ActivateUserButton({ user_id }){
 
 }  
 
+//  Single User Page Components Down from here
+export function ResetPasswordButton({ email_id }){
+    const reset_password = useUserStore((state)=>state.changePassword)
+
+    const resetPassword = () => { 
+        let data = {
+            "email" : email_id,
+            "password" : "default@12"
+          }
+        reset_password(data,true) 
+    }    
+    return (
+        <div className="flex w-full sm:w-8/12 justify-center items-center" >
+            <button className="bg-gray-400 w-10/12 h-10 text-xl font-bold rounded-lg transition ease-in-out duration-75 hover:-translate-y-1 hover:scale-110" onClick={()=>resetPassword()} >
+                Reset Password
+            </button>
+        </div>
+        )  
+
+}  
+
 export function DeactivateUserButton({ user_id }){
     const deactivate = useUserStore((state)=>state.activateDeactivate)
     const deactivateUser = () => { 
@@ -321,6 +342,65 @@ export function AddRoleToUserForm( {user_id } ){
                                 <div className="w-full flex flex-row justify-end items-end">
                                     <NormalButton 
                                     label="Add Role" 
+                                    handleClick={handleClick} />                                       
+                                </div>  
+
+                                </div>
+                                
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </Fragment>
+    )
+    
+}
+
+export function ChangePasswordForm( {email_id } ){
+    // feature render check
+    const feature_check = useCheckFeatures("user_write")
+    const reset_password = useUserStore((state)=>state.changePassword)
+    const [password, setPassword] = useState();
+    const handleClick =()=>{
+        let data = {
+            "email" : email_id,
+            "password" : password
+          }
+        if ( password != "select to add"){
+            reset_password(data,false)
+        }
+    }
+    const handleInputChange = (event) => {
+        event.persist();
+        const target=event.target
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        setPassword(value);
+      
+    };
+ 
+
+    return(
+        <Fragment>
+           <div className={`flex w-full content-center items-center justify-center h-full ${feature_check ? "": "hidden" } `}>
+                <div className="flex flex-col items-center justify-center min-w-0 break-words w-full rounded-lg  border-0">                    
+                    <div className="w-full  flex-auto px-4 lg:px-10 py-10 pt-0">
+                        <form className="p-5 w-full bg-sky-50 rounded-lg ">
+                                <div className="flex flex-col  md:flex-row w-full" >
+                                <div></div>
+                                <ErrorBoundary>
+                                    <SingleInput
+                                    name="password" 
+                                    label="Password"      
+                                    password={password}  
+                                    handler={handleInputChange.bind(this)}                                 
+                                    />
+                                </ErrorBoundary>
+                                </div>                                 
+                                <div className="flex flex-col md:flex-row space-x-2 w-full" > 
+                                <div></div> 
+                                <div className="w-full flex flex-row justify-end items-end">
+                                    <NormalButton 
+                                    label="Change Password" 
                                     handleClick={handleClick} />                                       
                                 </div>  
 
@@ -552,10 +632,9 @@ export function EditableSingleUserComponent( {item} ){
                         </ErrorBoundary>
                 </div>
                 <a  name="my_tabs_2" onClick={()=>setTabToken(3)} role="tab" className={`tab ${tabToken == 3 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> Operations </a>
-                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
-                    <div className="flex w-4/12 flex-col items-center justify-center h-full ">
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 w-full rounded-box p-6">
+                    <div className="flex w-full flex-col md:flex-row items-center justify-center h-full ">
                         <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
-                        
                             <ErrorBoundary>
                                 { item.disabled ?
                                 <ActivateUserButton  user_id={item.id}/>:
@@ -564,7 +643,16 @@ export function EditableSingleUserComponent( {item} ){
                                 }
                             </ErrorBoundary>
                         </div>  
+                        <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
+                            <ErrorBoundary>
+                                <ResetPasswordButton email_id={item.email} />
+                            </ErrorBoundary>
+                        </div>  
                     </div> 
+                </div>
+                <a  name="my_tabs_2" onClick={()=>setTabToken(4)} role="tab" className={`tab ${tabToken == 4 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="Change Password"> ChangePassword </a>
+                <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                    <ChangePasswordForm email_id={item.email} />
                 </div>
 
             </div>
@@ -815,9 +903,9 @@ export function EditableSingleUserComponentMobile({item}){
                                         <AddRoleToUserForm user_id={item.id} />
                                 </ErrorBoundary>
                         </div>
-                        <a  name="my_tabs_2" onClick={()=>setTabToken(3)} role="tab" className={`tab ${tabToken == 3 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="UseCases"> Operations </a>
+                        <a  name="my_tabs_2" onClick={()=>setTabToken(3)} role="tab" className={`tab ${tabToken == 3 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="Operations"> Operations </a>
                         <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
-                            <div className="flex w-4/12 flex-col items-center justify-center h-full ">
+                            <div className="flex w-full flex-col items-center justify-center h-full ">
                                 <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
                                 
                                     <ErrorBoundary>
@@ -827,9 +915,18 @@ export function EditableSingleUserComponentMobile({item}){
 
                                         }
                                     </ErrorBoundary>
-                                </div>  
+                                </div> 
+                                <div className="flex flex-row flex-wrap mx-5  items-center space-x-2 space-y-2 justify-center min-w-0 break-words w-full rounded-lg border-0 pb-2">    
+                                    <ErrorBoundary>
+                                        <ResetPasswordButton email_id={item.email} />
+                                    </ErrorBoundary>
+                                </div>   
                             </div> 
                         </div>
+                        <a  name="my_tabs_2" onClick={()=>setTabToken(4)} role="tab" className={`tab ${tabToken == 4 ? "tab-active" : ""} ${feature_check ? "": "hidden" } [--tab-bg:white] [--tab-border-color:black]`} aria-label="Change Password"> ChangePassword </a>
+                        <div role="tabpanel" className="tab-content  bg-gray-200  border-base-300 rounded-box p-6">
+                        <ChangePasswordForm email_id={item.email} />
+                         </div>
                     </div>
                 </div>                             
             </div>

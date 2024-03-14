@@ -7,7 +7,7 @@ import { useLogInStore } from './login'
 export const useDashBoardStore = create(
     persist(
     (set,get) => ({
-    app_id :"48015a9b-5a86-4a15-944b-94108aa78b4b",
+    app_id :"   ",
     app_role_features : null,
     app_pages : null,
     role_pages: null,
@@ -73,7 +73,6 @@ export const useDashBoardStore = create(
                });
        }
     
-
     }),
     {
         name: 'dash-storage', // name of the item in the storage (must be unique)

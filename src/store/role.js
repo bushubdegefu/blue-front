@@ -68,9 +68,7 @@ export const useRoleStore = create(
                    }).catch((response,error)=> {
                     
                        const responseError = response?.response?.data?.details
-                       toast.error(responseError,{
-                           position: 'top-right'
-                         })
+                       
                       
                    });
            },

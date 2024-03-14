@@ -7,23 +7,11 @@ import { useLogInStore } from "../store/login"
 export function Dashboard(){
 
     const [dropToggle,setDropToggle]=useState(false)
-    const loggedIn = useLogInStore((state)=>state.blue_admin_token)
     const role_pages = useDashBoardStore((state)=>state.role_pages)
     const user_roles = useLogInStore((state)=>state.roles)
     const logout = useLogInStore((state)=>state.resetTokenLogout)
     const app_pages = useDashBoardStore((state)=>state.app_pages)
-    const first_load = useDashBoardStore((state)=>state.getDashboardFeatures)
-    const first_pages = useDashBoardStore((state)=>state.getDashboardPages)
-    const load_pages = useDashBoardStore((state)=>state.getRolePages)
-    
-    useEffect(()=>{
-        if (loggedIn){
-            first_load()
-            first_pages()   
-            load_pages()
-        }
-    },[loggedIn])
-    
+    const loggedIn = useLogInStore((state)=>state.blue_admin_token) 
 
     const CheckRoles = (page_name) => {
         let result = false
@@ -84,23 +72,12 @@ export function Dashboard(){
 
 export function DashboardMobile(){
 
-    const loggedIn = useLogInStore((state)=>state.blue_admin_token)
     const role_pages = useDashBoardStore((state)=>state.role_pages)
     const user_roles = useLogInStore((state)=>state.roles)
     const logout = useLogInStore((state)=>state.resetTokenLogout)
     const app_pages = useDashBoardStore((state)=>state.app_pages)
-    const first_load = useDashBoardStore((state)=>state.getDashboardFeatures)
-    const first_pages = useDashBoardStore((state)=>state.getDashboardPages)
-    const load_pages = useDashBoardStore((state)=>state.getRolePages)
-    
-    useEffect(()=>{
-        if (loggedIn){
-            first_load()
-            first_pages()   
-            load_pages()
-        }
-    },[loggedIn])
-    
+    const loggedIn = useLogInStore((state)=>state.blue_admin_token)
+        
     const CheckRoles = (page_name) => {
         let result = false
         if (user_roles != null ){

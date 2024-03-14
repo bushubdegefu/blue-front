@@ -14,14 +14,26 @@ import { useStyle } from './store/theme'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { Dashboard, DashboardMobile, DashboardPCBar } from './page/Dashboard'
 import { PrivateRoutes } from './components/privateroute'
-
-
+import { useDashBoardStore } from './store/dashboard';
+import { useEffect } from 'react'
+import { useLogInStore } from './store/login'
 function App() {
   
   const contDivClass=useStyle((state)=> state.styles.bushuContSec)
   const dashDivClass=useStyle((state)=> state.styles.sideBarNav)
   const secClass=useStyle((state)=> state.styles.appSecClass)
- 
+  const first_load = useDashBoardStore((state)=>state.getDashboardFeatures)
+  const first_pages = useDashBoardStore((state)=>state.getDashboardPages)
+  const load_pages = useDashBoardStore((state)=>state.getRolePages)
+  const loggedIn = useLogInStore((state)=>state.blue_admin_token)
+
+  useEffect(()=>{
+		  first_load()
+		  first_pages()   
+		  load_pages()
+	  
+  },[loggedIn])		
+  
   return (
     <section className={secClass}>
 		<ErrorBoundary>

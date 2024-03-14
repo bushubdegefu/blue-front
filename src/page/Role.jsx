@@ -18,17 +18,12 @@ import useCheckPage from '../uitls/check_page';
 
 export function RolesDropDown({ label, roleId  ,name, handler}){
         const roles = useRoleStore((state)=>state.drop_roles)
-        const getRoles = useRoleStore((state)=>state.getDropRoles)   
-        
-      
-        useEffect(()=>{
-            getRoles()
-        },[])
-        
+        const getRoles = useRoleStore((state)=>state.getDropRoles)        
+
         if (roles.length > 0){
     
             return(       
-                <>
+            <>
             <SelectInput data={roles} name={name} value={roleId} handler={handler} label={label} />             
             </>
              )
