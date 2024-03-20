@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { useDashBoardStore } from "../store/dashboard"
 import { useLogInStore } from "../store/login"
+import { useNavigate } from "react-router-dom"
+import { BackIcon } from "../components/Icons"
 
 
 export function Dashboard(){
@@ -147,6 +149,7 @@ export function DashboardMobile(){
 
 
 export function DashboardPCBar(){
+    const history = useNavigate()
 
     const logout = useLogInStore((state)=>state.resetTokenLogout)
     const loggedIn = useLogInStore((state)=>state.blue_admin_token)
@@ -154,6 +157,9 @@ export function DashboardPCBar(){
     return (
         <div className="navbar w-full px-5 mx-1 bg-slate-100">
             <div className="flex-1">
+                <a  onClick={()=>history(-1)}> 
+                <BackIcon />
+                </a>
                 <a className="btn btn-ghost text-xl">{user_email}</a>
             </div>
             <div className="flex-none  justify-end">

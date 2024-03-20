@@ -39,7 +39,8 @@ export function LogInPage(){
         logged_in_state ?
         <Navigate to='/home'/> 
             :
-        <div className="items-start justify-center w-11/12 h-auto p-2 m-2">          
+            <>
+            <div className="items-start justify-center w-11/12 h-auto p-2 m-2">          
             <title>Login</title>
             <div className="flex w-full content-center items-center justify-center h-full">
                 <div className="w-full sm:w-7/12 md:w-6/12  lg:w-5/12 xl:w-4/12 sm:px-4 py-5 bg-gray-200 rounded-xl shadow">
@@ -99,8 +100,14 @@ export function LogInPage(){
                     </div>
                 </div>
             </div>
-         
-       
-        </div>
-    )
+            
+            </div>
+            <div className="w-full flex items-center justify-center pb-2 px-5">
+                <div role="alert" className="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+               <span>To login as super user you can use superuser@mail.com. password is "defult@123" for all users.</span>
+                </div>
+            </div>
+            </>     
+           )
 }
