@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+server-key.pem
+server.pem
+bun.lockb
